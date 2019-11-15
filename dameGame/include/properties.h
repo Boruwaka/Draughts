@@ -1,0 +1,27 @@
+#ifndef PROPERTIES_H_INCLUDED
+#define PROPERTIES_H_INCLUDED
+
+#define CONTINUE 1
+#define EXIT 0
+
+#define TRUE 1
+#define FALSE 0
+
+#define BLACK 1
+#define WHITE 2
+
+#define SPACING_HEIGHT 12
+#define SPACING_WIDTH 6
+#define OFFSET_HEIGHT 45
+#define OFFSET_WIDTH 47
+
+struct piece{
+    int posY;
+    int posX;
+    int height;
+    int width;
+    int isQueen;
+    int color;
+};
+
+#endif // PROPERTIES_H_INCLUDED
