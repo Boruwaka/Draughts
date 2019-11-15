@@ -129,15 +129,17 @@ int drawPieces(SDL_Renderer *renderer, struct piece pieces[], int nbPieces, SDL_
     for(int i=0; i<nbPieces; i++) {
 
         if(pieces[i].isPicked == TRUE) {
-            pieceParams.h = pieces[i].height * 1.5;
-            pieceParams.w = pieces[i].width * 1.5;
+            pieceParams.h = pieces[i].height * 1.2;
+            pieceParams.w = pieces[i].width * 1.2;
+            pieceParams.x = pieces[i].pickedPosX - OFFSET_WIDTH;
+            pieceParams.y = pieces[i].pickedPosY - OFFSET_HEIGHT;
         }
         else {
             pieceParams.w = pieces[i].width;
             pieceParams.h = pieces[i].height;
+            pieceParams.x = (((pieces[i].width + SPACING_WIDTH) * pieces[i].posX) - OFFSET_WIDTH);
+            pieceParams.y = (((pieces[i].height + SPACING_HEIGHT) * pieces[i].posY) - OFFSET_HEIGHT);
         }
-        pieceParams.x = (((pieces[i].width + SPACING_WIDTH) * pieces[i].posX) - OFFSET_WIDTH);
-        pieceParams.y = (((pieces[i].height + SPACING_HEIGHT) * pieces[i].posY) - OFFSET_HEIGHT);
 
         if(0 != SDL_RenderCopy(renderer, pieceImage, NULL, &pieceParams)){
             fprintf(stderr, "Erreur SDL_RenderCopy : %s", SDL_GetError());

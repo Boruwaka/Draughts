@@ -21,6 +21,8 @@
 struct piece{
     int posY;
     int posX;
+    int pickedPosX;
+    int pickedPosY;
     int height;
     int width;
     int isPicked;

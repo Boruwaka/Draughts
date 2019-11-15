@@ -35,6 +35,8 @@ void initPieces(struct piece pieces[], int nbPieces, int color, int boardSize) {
             pieces[pieceIndex].posX = widthIndex;
             pieces[pieceIndex].height = HEIGHT_PIECE;
             pieces[pieceIndex].width = WIDTH_PIECE;
+            pieces[pieceIndex].pickedPosX = 0;
+            pieces[pieceIndex].pickedPosY = 0;
             pieceIndex++;
         }
 
@@ -109,7 +111,6 @@ int main(int argc, char *argv[]){
                         && event.button.x < ((whitePieces[i].width + SPACING_WIDTH) * whitePieces[i].posX)
                         && event.button.x > ((whitePieces[i].width + SPACING_WIDTH) * whitePieces[i].posX) - OFFSET_WIDTH) {
                             whitePieces[i].isPicked = TRUE;
-                            drawGame(renderer, whitePieces, blackPieces, nbPieces, boardSize, whitePieceImage, blackPieceImage);
                         }
                     }
                 }
@@ -121,12 +122,19 @@ int main(int argc, char *argv[]){
                 if(currentPlayer == WHITE) {
                     for(int i=0; i < nbPieces; i++){
                         whitePieces[i].isPicked = FALSE;
-                        drawGame(renderer, whitePieces, blackPieces, nbPieces, boardSize, whitePieceImage, blackPieceImage);
                     }
                 }
             }
             break;
         }
+        for(int i=0; i < nbPieces; i++){
+            if(whitePieces[i].isPicked == TRUE){
+                whitePieces[i].pickedPosX = event.button.x;
+                whitePieces[i].pickedPosY = event.button.y;
+            }
+        }
+        drawGame(renderer, whitePieces, blackPieces, nbPieces, boardSize, whitePieceImage, blackPieceImage);
+        SDL_Delay(20);
     }while(gameState == CONTINUE);
 
      do {
