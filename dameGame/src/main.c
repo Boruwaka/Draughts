@@ -30,10 +30,11 @@ void initPieces(struct piece pieces[], int nbPieces, int color, int boardSize) {
         if(((widthIndex + heightIndex) % 2) != 0){
             pieces[pieceIndex].isQueen = FALSE;
             pieces[pieceIndex].color = color;
+            pieces[pieceIndex].isPicked = FALSE;
             pieces[pieceIndex].posY = heightIndex;
             pieces[pieceIndex].posX = widthIndex;
-            pieces[pieceIndex].height = 0;
-            pieces[pieceIndex].width = 0;
+            pieces[pieceIndex].height = HEIGHT_PIECE;
+            pieces[pieceIndex].width = WIDTH_PIECE;
             pieceIndex++;
         }
 
@@ -89,8 +90,6 @@ int main(int argc, char *argv[]){
     }
 
     drawGame(renderer, whitePieces, blackPieces, nbPieces, boardSize, whitePieceImage, blackPieceImage);
-    SDL_Delay(1000);
-    drawGame(renderer, whitePieces, blackPieces, nbPieces, boardSize, whitePieceImage, blackPieceImage);
 
     SDL_Event event;
 
@@ -103,27 +102,31 @@ int main(int argc, char *argv[]){
 
         case SDL_MOUSEBUTTONDOWN :
             if(event.button.button == SDL_BUTTON_LEFT){
-                if(event.button.state == SDL_PRESSED ) {
-                    if(currentPlayer == WHITE) {
-                        for(int i=0; i < nbPieces; i++){
-                            if(event.button.y < ((whitePieces[i].height + SPACING_HEIGHT) * whitePieces[i].posY) + OFFSET_HEIGHT
-                            && event.button.y > ((whitePieces[i].height + SPACING_HEIGHT) * whitePieces[i].posY) - OFFSET_HEIGHT
-                            && event.button.x < ((whitePieces[i].width + SPACING_WIDTH) * whitePieces[i].posX) + OFFSET_WIDTH
-                            && event.button.x > ((whitePieces[i].width + SPACING_WIDTH) * whitePieces[i].posX) - OFFSET_WIDTH) {
-                                printf("MATCHED PIECE : %d = \n y: %d  -  x: %d \n y: %d  -  x: %d", i, whitePieces[i].posY, whitePieces[i].posX, event.button.y, event.button.x);
-                                whitePieces[i].width += 20;
-                                whitePieces[i].height += 20;
-                                drawGame(renderer, whitePieces, blackPieces, nbPieces, boardSize, whitePieceImage, blackPieceImage);
-                            }
+                if(currentPlayer == WHITE) {
+                    for(int i=0; i < nbPieces; i++){
+                        if(event.button.y < ((whitePieces[i].height + SPACING_HEIGHT) * whitePieces[i].posY)
+                        && event.button.y > ((whitePieces[i].height + SPACING_HEIGHT) * whitePieces[i].posY) - OFFSET_HEIGHT
+                        && event.button.x < ((whitePieces[i].width + SPACING_WIDTH) * whitePieces[i].posX)
+                        && event.button.x > ((whitePieces[i].width + SPACING_WIDTH) * whitePieces[i].posX) - OFFSET_WIDTH) {
+                            whitePieces[i].isPicked = TRUE;
+                            drawGame(renderer, whitePieces, blackPieces, nbPieces, boardSize, whitePieceImage, blackPieceImage);
                         }
                     }
                 }
-                if(event.button.state == SDL_RELEASED) {
+            }
+            break;
 
+        case SDL_MOUSEBUTTONUP :
+            if(event.button.button == SDL_BUTTON_LEFT){
+                if(currentPlayer == WHITE) {
+                    for(int i=0; i < nbPieces; i++){
+                        whitePieces[i].isPicked = FALSE;
+                        drawGame(renderer, whitePieces, blackPieces, nbPieces, boardSize, whitePieceImage, blackPieceImage);
+                    }
                 }
             }
+            break;
         }
-
     }while(gameState == CONTINUE);
 
      do {

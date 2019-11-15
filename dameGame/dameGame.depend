@@ -703,7 +703,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1573771734 source:c:\users\mihaw\documents\project\draughts\damegame\src\main.c
+1573842777 source:c:\users\mihaw\documents\project\draughts\damegame\src\main.c
 	<stdio.h>
 	<stdlib.h>
 	<SDL2/SDL.h>
@@ -1057,12 +1057,12 @@
 	"begin_code.h"
 	"close_code.h"
 
-1573767463 c:\users\mihaw\documents\project\draughts\damegame\include\properties.h
+1573842140 c:\users\mihaw\documents\project\draughts\damegame\include\properties.h
 
 1573768274 c:\users\mihaw\documents\project\draughts\damegame\include\graphicrendering.h
 	"properties.h"
 
-1573839221 source:c:\users\mihaw\documents\project\draughts\damegame\src\graphicrendering.c
+1573842346 source:c:\users\mihaw\documents\project\draughts\damegame\src\graphicrendering.c
 	<stdio.h>
 	<stdlib.h>
 	<SDL2/SDL.h>

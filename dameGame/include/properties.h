@@ -15,11 +15,15 @@
 #define OFFSET_HEIGHT 45
 #define OFFSET_WIDTH 47
 
+#define WIDTH_PIECE 54
+#define HEIGHT_PIECE 48
+
 struct piece{
     int posY;
     int posX;
     int height;
     int width;
+    int isPicked;
     int isQueen;
     int color;
 };
