@@ -74,22 +74,31 @@ int main(int argc, char *argv[]){
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
     int statut = 0;
-    int nbPieces=0;
 
-    int boardSize = 10;
-    switch (boardSize) {
+    struct board board;
+    board.posX = 5;
+    board.posY = 5;
+    board.size = 8;
+
+    switch (board.size) {
     case 8:
-        nbPieces = 12;
+        board.nbPieces = 12;
+        board.height = 490;
+        board.width = 490;
         break;
     case 10:
-        nbPieces = 20;
+        board.nbPieces = 20;
+        board.height = 610;
+        board.width = 610;
         break;
     case 12:
-        nbPieces = 30;
+        board.nbPieces = 30;
+        board.height = 730;
+        board.width = 730;
         break;
     }
-    struct piece whitePieces[nbPieces];
-    struct piece blackPieces[nbPieces];
+    struct piece whitePieces[board.nbPieces];
+    struct piece blackPieces[board.nbPieces];
 
     SDL_Color yellow = {255, 240, 140, 0};
     SDL_Color green = {40, 150, 40, 0};
@@ -100,15 +109,15 @@ int main(int argc, char *argv[]){
     SDL_Texture *blackPieceImage = NULL;
     blackPieceImage = loadImage("assets/blackPiece.bmp", renderer);
 
-    initPieces(whitePieces, nbPieces, WHITE, boardSize);
-    initPieces(blackPieces, nbPieces, BLACK, boardSize);
-    for(int i = 0; i<nbPieces; i++) {
+    initPieces(whitePieces, board.nbPieces, WHITE, board.size);
+    initPieces(blackPieces, board.nbPieces, BLACK, board.size);
+    for(int i = 0; i<board.nbPieces; i++) {
         printf("%d : %d \t%d \t%d \t%d", i, whitePieces[i].isQueen, whitePieces[i].color, whitePieces[i].posY, whitePieces[i].posX);
         printf(" ||| %d \t%d \t%d \t%d", blackPieces[i].isQueen, blackPieces[i].color, blackPieces[i].posY, blackPieces[i].posX);
         printf("\n");
     }
 
-    drawGame(renderer, whitePieces, blackPieces, nbPieces, boardSize, whitePieceImage, blackPieceImage);
+    drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage);
 
     SDL_Event event;
 
@@ -122,10 +131,10 @@ int main(int argc, char *argv[]){
         case SDL_MOUSEBUTTONDOWN :
             if(event.button.button == SDL_BUTTON_LEFT){
                 if(currentPlayer == WHITE) {
-                    initMovement(whitePieces, nbPieces, event);
+                    initMovement(whitePieces, board.nbPieces, event);
                 }
                 else {
-                    initMovement(blackPieces, nbPieces, event);
+                    initMovement(blackPieces, board.nbPieces, event);
                 }
             }
             break;
@@ -133,21 +142,21 @@ int main(int argc, char *argv[]){
         case SDL_MOUSEBUTTONUP :
             if(event.button.button == SDL_BUTTON_LEFT){
                 if(currentPlayer == WHITE) {
-                    endMovement(whitePieces, nbPieces);
+                    endMovement(whitePieces, board.nbPieces);
                 }
                 else {
-                    endMovement(blackPieces, nbPieces);
+                    endMovement(blackPieces, board.nbPieces);
                 }
             }
             break;
         }
-         for(int i=0; i < nbPieces; i++){
+         for(int i=0; i < board.nbPieces; i++){
             if(whitePieces[i].isPicked == TRUE){
                 whitePieces[i].pickedPosX = event.button.x;
                 whitePieces[i].pickedPosY = event.button.y;
             }
         }
-        drawGame(renderer, whitePieces, blackPieces, nbPieces, boardSize, whitePieceImage, blackPieceImage);
+        drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage);
         SDL_Delay(10);
     }while(gameState == CONTINUE);
 

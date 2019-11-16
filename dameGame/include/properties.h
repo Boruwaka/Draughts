@@ -30,4 +30,12 @@ struct piece{
     int color;
 };
 
+struct board{
+    int posY;
+    int posX;
+    int height;
+    int width;
+    int size;
+    int nbPieces;
+};
 #endif // PROPERTIES_H_INCLUDED

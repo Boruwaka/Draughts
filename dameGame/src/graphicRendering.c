@@ -21,24 +21,17 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int w, int h, SDL_C
     return 0;
 }
 
-int drawGame(SDL_Renderer *renderer, struct piece whitePieces[], struct piece blackPieces[], int nbPieces, int boardSize, SDL_Texture *whitePieceImage, SDL_Texture *blackPieceImage) {
-SDL_Rect rect = {5, 5, 610, 610};
-    if(0 != SDL_SetRenderDrawColor(renderer, 170, 100, 50, 255)){
-        fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
-        return -1;
-    };
-    SDL_RenderFillRect(renderer, &rect);
-
-    if(0 != drawboard(renderer, boardSize)) {
+int drawGame(SDL_Renderer *renderer, struct piece whitePieces[], struct piece blackPieces[], struct board board, SDL_Texture *whitePieceImage, SDL_Texture *blackPieceImage) {
+    if(0 != drawBoard(renderer, board)) {
         fprintf(stderr, "Erreur drawboard : %s", SDL_GetError());
         return -1;
     }
 
-    if(0 != drawPieces(renderer, whitePieces, nbPieces, whitePieceImage)) {
+    if(0 != drawPieces(renderer, whitePieces, board, whitePieceImage)) {
         fprintf(stderr, "Erreur drawPieces : %s", SDL_GetError());
         return -1;
     }
-    if(0 != drawPieces(renderer, blackPieces, nbPieces, blackPieceImage)) {
+    if(0 != drawPieces(renderer, blackPieces, board, blackPieceImage)) {
         fprintf(stderr, "Erreur drawPieces : %s", SDL_GetError());
         return -1;
     }
@@ -76,8 +69,23 @@ SDL_Texture *loadImage(const char path[], SDL_Renderer *renderer){
     return texture;
 }
 
-int drawboard(SDL_Renderer *renderer, int size){
-    int nbSquare = (size * size);
+int drawBorder(SDL_Renderer *renderer, struct board board) {
+    SDL_Rect rect = {board.posX, board.posY, board.height, board.width};
+    if(0 != SDL_SetRenderDrawColor(renderer, 170, 100, 50, 255)){
+        fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
+        return -1;
+    };
+    SDL_RenderFillRect(renderer, &rect);
+    return 0;
+}
+
+int drawBoard(SDL_Renderer *renderer, struct board board){
+    if(0 != drawBorder(renderer, board)){
+        fprintf(stderr, "Erreur drawBorder : %s", SDL_GetError());
+        return -1;
+    }
+
+    int nbSquare = (board.size * board.size);
     SDL_Rect damierWhite[nbSquare/2];
     SDL_Rect damierBlack[nbSquare/2];
     int posX=0; int posY=0; int idxW = 0; int idxB = 0;
@@ -97,7 +105,7 @@ int drawboard(SDL_Renderer *renderer, int size){
             damierWhite[idxW].y = 10 + posY*60;
             idxW++;
         }
-        if(posX == size-1){
+        if(posX == board.size-1){
             posX = 0;
             posY++;
         }
@@ -125,7 +133,7 @@ int drawboard(SDL_Renderer *renderer, int size){
     return 0;
 }
 
-int drawPieces(SDL_Renderer *renderer, struct piece pieces[], int nbPieces, SDL_Texture *pieceImage){
+int drawPieces(SDL_Renderer *renderer, struct piece pieces[], struct board board, SDL_Texture *pieceImage){
     SDL_Rect imageParams = {0, 0, 0, 0};
     SDL_Rect pieceParams = {0, 0, 0, 0};
 
@@ -134,13 +142,13 @@ int drawPieces(SDL_Renderer *renderer, struct piece pieces[], int nbPieces, SDL_
         return -1;
     }
 
-    for(int i=0; i<nbPieces; i++) {
+    for(int i=0; i<board.nbPieces; i++) {
 
         if(pieces[i].isPicked == TRUE) {
             pieceParams.h = pieces[i].height * 1.2;
             pieceParams.w = pieces[i].width * 1.2;
-            if(pieces[i].pickedPosX >= 595) {
-                pieceParams.x = 550;
+            if(pieces[i].pickedPosX >= board.width - 15) {
+                pieceParams.x = board.width - OFFSET_WIDTH - 15;
             }
             else if(pieces[i].pickedPosX <= 55) {
                 pieceParams.x = 10;
@@ -149,8 +157,8 @@ int drawPieces(SDL_Renderer *renderer, struct piece pieces[], int nbPieces, SDL_
                 pieceParams.x = pieces[i].pickedPosX - OFFSET_WIDTH;
             }
 
-            if(pieces[i].pickedPosY >= 595) {
-                pieceParams.y = 550;
+            if(pieces[i].pickedPosY >= board.height - 10) {
+                pieceParams.y = board.width - OFFSET_HEIGHT - 10;
             }
             else if(pieces[i].pickedPosY <= 55) {
                 pieceParams.y = 10;
