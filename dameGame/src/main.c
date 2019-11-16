@@ -70,7 +70,7 @@ int main(int argc, char *argv[]){
     freopen("stdout.txt", "w", stdout);
     freopen("stderr.txt", "w", stderr);
     int gameState = CONTINUE;
-    int currentPlayer = WHITE;
+    int currentPlayer = BLACK;
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
     int statut = 0;
@@ -78,7 +78,15 @@ int main(int argc, char *argv[]){
     struct board board;
     board.posX = 5;
     board.posY = 5;
-    board.size = 8;
+    board.size = 10;
+    board.colorDefault.r = 100;
+    board.colorDefault.g = 100;
+    board.colorDefault.b = 100;
+    board.colorDefault.a = 255;
+    board.colorPicked.r = 130;
+    board.colorPicked.g = 100;
+    board.colorPicked.b = 220;
+    board.colorPicked.a = 255;
 
     switch (board.size) {
     case 8:
@@ -99,10 +107,14 @@ int main(int argc, char *argv[]){
     }
     struct piece whitePieces[board.nbPieces];
     struct piece blackPieces[board.nbPieces];
+    int nbTile = ((board.size * board.size) / 2);
+    struct tile blackTiles[nbTile];
+
+    initGame(blackTiles, board.size);
 
     SDL_Color yellow = {255, 240, 140, 0};
     SDL_Color green = {40, 150, 40, 0};
-    if(0 != initWindow(&window, &renderer, 1000, 740, yellow))
+    if(0 != initWindow(&window, &renderer, 1000, 740))
         goto Quit;
     SDL_Texture *whitePieceImage = NULL;
     whitePieceImage = loadImage("assets/whitePiece.bmp", renderer);
@@ -117,7 +129,7 @@ int main(int argc, char *argv[]){
         printf("\n");
     }
 
-    drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage);
+    drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, yellow, blackTiles);
 
     SDL_Event event;
 
@@ -155,9 +167,12 @@ int main(int argc, char *argv[]){
                 whitePieces[i].pickedPosX = event.button.x;
                 whitePieces[i].pickedPosY = event.button.y;
             }
+            if(blackPieces[i].isPicked == TRUE){
+                blackPieces[i].pickedPosX = event.button.x;
+                blackPieces[i].pickedPosY = event.button.y;
+            }
         }
-        drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage);
-        SDL_Delay(10);
+        drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, yellow, blackTiles);
     }while(gameState == CONTINUE);
 
      do {

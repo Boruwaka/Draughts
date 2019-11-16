@@ -4,7 +4,7 @@
 #include "properties.h"
 #include "graphicRendering.h"
 
-int initWindow(SDL_Window **window, SDL_Renderer **renderer, int w, int h, SDL_Color background){
+int initWindow(SDL_Window **window, SDL_Renderer **renderer, int w, int h){
     if(0 != SDL_Init(SDL_INIT_VIDEO)){
         fprintf(stderr, "Erreur SDL_Init : %s", SDL_GetError());
         return -1;
@@ -13,16 +13,41 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int w, int h, SDL_C
         fprintf(stderr, "Erreur SDL_CreateWindowAndRenderer : %s", SDL_GetError());
         return -1;
     }
-    if(0 != setWindowColor(*renderer, background)) {
+    return 0;
+}
+
+int initGame(struct tile blackTiles[], int size) {
+    int nbTile = ((size*size) / 2);
+    int posX=0; int posY=0; int indexTab=0;
+    for(int i = 0; i<(size * size); i++){
+        if(((i + posY) % 2) != 0){
+            blackTiles[indexTab].params.x = 10 + posX*60;
+            blackTiles[indexTab].params.y = 10 + posY*60;
+            blackTiles[indexTab].params.h = 60;
+            blackTiles[indexTab].params.w = 60;
+            blackTiles[indexTab].isPicked = FALSE;
+            indexTab++;
+        }
+
+        if(posX == (size-1)){
+            posX = 0;
+            posY++;
+        }
+        else{
+            posX++;
+        }
+    }
+    return 0;
+}
+
+int drawGame(SDL_Renderer *renderer, struct piece whitePieces[], struct piece blackPieces[], struct board board, SDL_Texture *whitePieceImage, SDL_Texture *blackPieceImage, SDL_Color background, struct tile blackTiles[]) {
+    SDL_RenderClear(renderer);
+    if(0 != setWindowColor(renderer, background)) {
         fprintf(stderr, "Erreur setWindowColor : %s", SDL_GetError());
         return -1;
     }
 
-    return 0;
-}
-
-int drawGame(SDL_Renderer *renderer, struct piece whitePieces[], struct piece blackPieces[], struct board board, SDL_Texture *whitePieceImage, SDL_Texture *blackPieceImage) {
-    if(0 != drawBoard(renderer, board)) {
+    if(0 != drawBoard(renderer, board, blackTiles)) {
         fprintf(stderr, "Erreur drawboard : %s", SDL_GetError());
         return -1;
     }
@@ -79,57 +104,39 @@ int drawBorder(SDL_Renderer *renderer, struct board board) {
     return 0;
 }
 
-int drawBoard(SDL_Renderer *renderer, struct board board){
+int drawBoard(SDL_Renderer *renderer, struct board board, struct tile blackTiles[]){
     if(0 != drawBorder(renderer, board)){
         fprintf(stderr, "Erreur drawBorder : %s", SDL_GetError());
         return -1;
     }
-
-    int nbSquare = (board.size * board.size);
-    SDL_Rect damierWhite[nbSquare/2];
-    SDL_Rect damierBlack[nbSquare/2];
-    int posX=0; int posY=0; int idxW = 0; int idxB = 0;
-
-    for(int i = 0; i<nbSquare; i++){
-        if(((i + posY) % 2) == 0){
-            damierBlack[idxB].w = 60;
-            damierBlack[idxB].h = 60;
-            damierBlack[idxB].x = 10 + posX*60;
-            damierBlack[idxB].y = 10 + posY*60;
-            idxB++;
-        }
-        else{
-            damierWhite[idxW].w = 60;
-            damierWhite[idxW].h = 60;
-            damierWhite[idxW].x = 10 + posX*60;
-            damierWhite[idxW].y = 10 + posY*60;
-            idxW++;
-        }
-        if(posX == board.size-1){
-            posX = 0;
-            posY++;
-        }
-        else{
-            posX++;
-        }
-    };
-
+    SDL_Rect rect = {board.posX + 5, board.posY + 5, board.height - 10, board.width - 10};
     if(0 != SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255)){
         fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
         return -1;
+    };
+    SDL_RenderFillRect(renderer, &rect);
+    int nbTiles = ((board.size * board.size) / 2);
+
+    for(int i = 0; i<nbTiles; i++){
+        if(blackTiles[i].isPicked == TRUE) {
+            if(0 != SDL_SetRenderDrawColor(renderer, board.colorPicked.r, board.colorPicked.g, board.colorPicked.b, board.colorPicked.a)){
+                fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
+                return -1;
+            }
+        }
+        else {
+            if(0 != SDL_SetRenderDrawColor(renderer, board.colorDefault.r, board.colorDefault.g, board.colorDefault.b, board.colorDefault.a)){
+                fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
+                return -1;
+            }
+        }
+
+        if(0 != SDL_RenderFillRect(renderer, &blackTiles[i].params)){
+            fprintf(stderr, "Erreur SDL_RenderFillRects : %s", SDL_GetError());
+            return -1;
+        }
     }
-    if(0 != SDL_RenderFillRects(renderer, damierBlack, nbSquare/2)){
-        fprintf(stderr, "Erreur SDL_RenderFillRects : %s", SDL_GetError());
-        return -1;
-    }
-    if(0 != SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255)){
-        fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
-        return -1;
-    }
-    if(0 != SDL_RenderFillRects(renderer, damierWhite, nbSquare/2)){
-        fprintf(stderr, "Erreur SDL_RenderFillRects : %s", SDL_GetError());
-        return -1;
-    }
+
     return 0;
 }
 

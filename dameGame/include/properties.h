@@ -18,7 +18,7 @@
 #define WIDTH_PIECE 54
 #define HEIGHT_PIECE 48
 
-struct piece{
+struct piece {
     int posY;
     int posX;
     int pickedPosX;
@@ -30,12 +30,19 @@ struct piece{
     int color;
 };
 
-struct board{
-    int posY;
+struct board {
     int posX;
+    int posY;
     int height;
     int width;
     int size;
     int nbPieces;
+    SDL_Color colorDefault;
+    SDL_Color colorPicked;
+};
+
+struct tile {
+    SDL_Rect params;
+    int isPicked;
 };
 #endif // PROPERTIES_H_INCLUDED
