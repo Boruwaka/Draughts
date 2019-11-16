@@ -22,6 +22,13 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int w, int h, SDL_C
 }
 
 int drawGame(SDL_Renderer *renderer, struct piece whitePieces[], struct piece blackPieces[], int nbPieces, int boardSize, SDL_Texture *whitePieceImage, SDL_Texture *blackPieceImage) {
+SDL_Rect rect = {5, 5, 610, 610};
+    if(0 != SDL_SetRenderDrawColor(renderer, 170, 100, 50, 255)){
+        fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
+        return -1;
+    };
+    SDL_RenderFillRect(renderer, &rect);
+
     if(0 != drawboard(renderer, boardSize)) {
         fprintf(stderr, "Erreur drawboard : %s", SDL_GetError());
         return -1;
@@ -35,6 +42,7 @@ int drawGame(SDL_Renderer *renderer, struct piece whitePieces[], struct piece bl
         fprintf(stderr, "Erreur drawPieces : %s", SDL_GetError());
         return -1;
     }
+
     SDL_RenderPresent(renderer);
     return 0;
 }

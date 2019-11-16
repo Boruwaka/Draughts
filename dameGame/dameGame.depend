@@ -1062,7 +1062,7 @@
 1573768274 c:\users\mihaw\documents\project\draughts\damegame\include\graphicrendering.h
 	"properties.h"
 
-1573844516 source:c:\users\mihaw\documents\project\draughts\damegame\src\graphicrendering.c
+1573917180 source:c:\users\mihaw\documents\project\draughts\damegame\src\graphicrendering.c
 	<stdio.h>
 	<stdlib.h>
 	<SDL2/SDL.h>
