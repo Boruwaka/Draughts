@@ -131,8 +131,25 @@ int drawPieces(SDL_Renderer *renderer, struct piece pieces[], int nbPieces, SDL_
         if(pieces[i].isPicked == TRUE) {
             pieceParams.h = pieces[i].height * 1.2;
             pieceParams.w = pieces[i].width * 1.2;
-            pieceParams.x = pieces[i].pickedPosX - OFFSET_WIDTH;
-            pieceParams.y = pieces[i].pickedPosY - OFFSET_HEIGHT;
+            if(pieces[i].pickedPosX >= 595) {
+                pieceParams.x = 550;
+            }
+            else if(pieces[i].pickedPosX <= 55) {
+                pieceParams.x = 10;
+            }
+            else {
+                pieceParams.x = pieces[i].pickedPosX - OFFSET_WIDTH;
+            }
+
+            if(pieces[i].pickedPosY >= 595) {
+                pieceParams.y = 550;
+            }
+            else if(pieces[i].pickedPosY <= 55) {
+                pieceParams.y = 10;
+            }
+            else {
+                pieceParams.y = pieces[i].pickedPosY - OFFSET_HEIGHT;
+            }
         }
         else {
             pieceParams.w = pieces[i].width;

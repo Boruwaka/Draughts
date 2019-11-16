@@ -49,6 +49,23 @@ void initPieces(struct piece pieces[], int nbPieces, int color, int boardSize) {
     }while(pieceIndex != nbPieces);
 }
 
+void initMovement(struct piece pieces[], int nbPieces,SDL_Event event) {
+    for(int i=0; i < nbPieces; i++){
+        if(event.button.y < ((pieces[i].height + SPACING_HEIGHT) * pieces[i].posY)
+        && event.button.y > ((pieces[i].height + SPACING_HEIGHT) * pieces[i].posY) - OFFSET_HEIGHT
+        && event.button.x < ((pieces[i].width + SPACING_WIDTH) * pieces[i].posX)
+        && event.button.x > ((pieces[i].width + SPACING_WIDTH) * pieces[i].posX) - OFFSET_WIDTH) {
+            pieces[i].isPicked = TRUE;
+        }
+    }
+}
+
+void endMovement(struct piece pieces[], int nbPieces) {
+    for(int i=0; i < nbPieces; i++){
+        pieces[i].isPicked = FALSE;
+    }
+}
+
 int main(int argc, char *argv[]){
     freopen("stdout.txt", "w", stdout);
     freopen("stderr.txt", "w", stderr);
@@ -105,14 +122,10 @@ int main(int argc, char *argv[]){
         case SDL_MOUSEBUTTONDOWN :
             if(event.button.button == SDL_BUTTON_LEFT){
                 if(currentPlayer == WHITE) {
-                    for(int i=0; i < nbPieces; i++){
-                        if(event.button.y < ((whitePieces[i].height + SPACING_HEIGHT) * whitePieces[i].posY)
-                        && event.button.y > ((whitePieces[i].height + SPACING_HEIGHT) * whitePieces[i].posY) - OFFSET_HEIGHT
-                        && event.button.x < ((whitePieces[i].width + SPACING_WIDTH) * whitePieces[i].posX)
-                        && event.button.x > ((whitePieces[i].width + SPACING_WIDTH) * whitePieces[i].posX) - OFFSET_WIDTH) {
-                            whitePieces[i].isPicked = TRUE;
-                        }
-                    }
+                    initMovement(whitePieces, nbPieces, event);
+                }
+                else {
+                    initMovement(blackPieces, nbPieces, event);
                 }
             }
             break;
@@ -120,21 +133,22 @@ int main(int argc, char *argv[]){
         case SDL_MOUSEBUTTONUP :
             if(event.button.button == SDL_BUTTON_LEFT){
                 if(currentPlayer == WHITE) {
-                    for(int i=0; i < nbPieces; i++){
-                        whitePieces[i].isPicked = FALSE;
-                    }
+                    endMovement(whitePieces, nbPieces);
+                }
+                else {
+                    endMovement(blackPieces, nbPieces);
                 }
             }
             break;
         }
-        for(int i=0; i < nbPieces; i++){
+         for(int i=0; i < nbPieces; i++){
             if(whitePieces[i].isPicked == TRUE){
                 whitePieces[i].pickedPosX = event.button.x;
                 whitePieces[i].pickedPosY = event.button.y;
             }
         }
         drawGame(renderer, whitePieces, blackPieces, nbPieces, boardSize, whitePieceImage, blackPieceImage);
-        SDL_Delay(20);
+        SDL_Delay(10);
     }while(gameState == CONTINUE);
 
      do {

@@ -703,7 +703,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1573844508 source:c:\users\mihaw\documents\project\draughts\damegame\src\main.c
+1573862792 source:c:\users\mihaw\documents\project\draughts\damegame\src\main.c
 	<stdio.h>
 	<stdlib.h>
 	<SDL2/SDL.h>
