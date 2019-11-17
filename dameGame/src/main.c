@@ -40,6 +40,8 @@ void initPieces(struct piece pieces[], int nbPieces, int color, int boardSize) {
             pieceIndex++;
         }
 
+
+
         posX++;
         if(posX > boardSize){
             posX = 1;
@@ -73,15 +75,31 @@ void resetValidMove(struct board board, struct tile blackTiles[]) {
     }
 }
 
-void checkValidSimpleMove(struct piece piece, struct board board, struct tile blackTiles[]) {
+int checkIfTileOccupated(struct tile blackTile, struct board board, struct piece whitePieces[], struct piece blackPieces[]) {
+    for(int i=0; i<board.nbPieces; i++) {
+        if((whitePieces[i].posX == blackTile.posX+1) && (whitePieces[i].posY == blackTile.posY)) {
+            return TRUE;
+        }
+        if((blackPieces[i].posX == blackTile.posX+1) && (blackPieces[i].posY == blackTile.posY)) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+void checkValidSimpleMove(struct piece piece, struct board board, struct tile blackTiles[], struct piece whitePieces[], struct piece blackPieces[]) {
     int nbTiles = ((board.size * board.size) / 2);
     if(piece.isQueen == FALSE) {
         if(piece.color == WHITE) {
             for(int i = 0; i<nbTiles; i++) {
-                if(blackTiles[i].posY == piece.posY) {
+                if(blackTiles[i].posY-1 == piece.posY) {
                     if (blackTiles[i].posX == piece.posX || blackTiles[i].posX == piece.posX - 2) {
-                        blackTiles[i].isPossibleMove = TRUE;
-
+                        if(TRUE == checkIfTileOccupated(blackTiles[i], board, whitePieces, blackPieces)) {
+                            blackTiles[i].isPossibleMove = FALSE;
+                        }
+                        else {
+                            blackTiles[i].isPossibleMove = TRUE;
+                        }
                     }
                 }
             }
@@ -91,6 +109,7 @@ void checkValidSimpleMove(struct piece piece, struct board board, struct tile bl
                 if(blackTiles[i].posY == piece.posY - 2) {
                     if (blackTiles[i].posX == piece.posX || blackTiles[i].posX == piece.posX - 2) {
                         blackTiles[i].isPossibleMove = TRUE;
+                        checkIfTileOccupated(blackTiles[i], board, whitePieces, blackPieces);
                     }
                 }
             }
@@ -194,12 +213,12 @@ int main(int argc, char *argv[]){
             if(whitePieces[i].isPicked == TRUE){
                 whitePieces[i].renderPosX = event.button.x;
                 whitePieces[i].renderPosY = event.button.y;
-                checkValidSimpleMove(whitePieces[i], board, blackTiles);
+                checkValidSimpleMove(whitePieces[i], board, blackTiles, whitePieces, blackPieces);
             }
             if(blackPieces[i].isPicked == TRUE){
                 blackPieces[i].renderPosX = event.button.x;
                 blackPieces[i].renderPosY = event.button.y;
-                checkValidSimpleMove(blackPieces[i], board, blackTiles);
+                checkValidSimpleMove(blackPieces[i], board, blackTiles, whitePieces, blackPieces);
             }
         }
         drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, yellow, blackTiles);

@@ -18,11 +18,11 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int w, int h){
 
 int initGame(struct tile blackTiles[], int size) {
   //  int nbTile = ((size*size) / 2);
-    int posX=0; int posY=0; int indexTab=0;
+    int posX=1; int posY=1; int indexTab=0;
     for(int i = 0; i<(size * size); i++){
         if(((i + posY) % 2) != 0){
             blackTiles[indexTab].params.x = 10 + posX*60;
-            blackTiles[indexTab].params.y = 10 + posY*60;
+            blackTiles[indexTab].params.y = 10 + posY*60 - 60;
             blackTiles[indexTab].params.h = 60;
             blackTiles[indexTab].params.w = 60;
             blackTiles[indexTab].posX = posX;
