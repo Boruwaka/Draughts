@@ -5,45 +5,45 @@
 #include "graphicRendering.h"
 
 void initPieces(struct piece pieces[], int nbPieces, int color, int boardSize) {
-    int widthIndex = 1;
-    int heightIndex = 1;
+    int posX = 1;
+    int posY = 1;
     int pieceIndex = 0;
 
     if(color == WHITE){
-        heightIndex = 1;
+        posY = 1;
     }
     else {
         switch (nbPieces){
         case 12:
-            heightIndex = 6;
+            posY = 6;
             break;
         case 20:
-            heightIndex = 7;
+            posY = 7;
             break;
         case 30:
-            heightIndex = 8;
+            posY = 8;
             break;
         }
     }
 
     do{
-        if(((widthIndex + heightIndex) % 2) != 0){
+        if(((posX + posY) % 2) != 0){
             pieces[pieceIndex].isQueen = FALSE;
             pieces[pieceIndex].color = color;
             pieces[pieceIndex].isPicked = FALSE;
-            pieces[pieceIndex].posY = heightIndex;
-            pieces[pieceIndex].posX = widthIndex;
+            pieces[pieceIndex].posY = posY;
+            pieces[pieceIndex].posX = posX;
             pieces[pieceIndex].height = HEIGHT_PIECE;
             pieces[pieceIndex].width = WIDTH_PIECE;
-            pieces[pieceIndex].pickedPosX = 0;
-            pieces[pieceIndex].pickedPosY = 0;
+            pieces[pieceIndex].renderPosX = 0;
+            pieces[pieceIndex].renderPosY = 0;
             pieceIndex++;
         }
 
-        widthIndex++;
-        if(widthIndex > boardSize){
-            widthIndex = 1;
-            heightIndex++;
+        posX++;
+        if(posX > boardSize){
+            posX = 1;
+            posY++;
         }
 
     }while(pieceIndex != nbPieces);
@@ -63,6 +63,38 @@ void initMovement(struct piece pieces[], int nbPieces,SDL_Event event) {
 void endMovement(struct piece pieces[], int nbPieces) {
     for(int i=0; i < nbPieces; i++){
         pieces[i].isPicked = FALSE;
+    }
+}
+
+void resetValidMove(struct board board, struct tile blackTiles[]) {
+    int nbTiles = ((board.size * board.size) / 2);
+    for(int i=0; i<nbTiles; i++) {
+        blackTiles[i].isPossibleMove = FALSE;
+    }
+}
+
+void checkValidSimpleMove(struct piece piece, struct board board, struct tile blackTiles[]) {
+    int nbTiles = ((board.size * board.size) / 2);
+    if(piece.isQueen == FALSE) {
+        if(piece.color == WHITE) {
+            for(int i = 0; i<nbTiles; i++) {
+                if(blackTiles[i].posY == piece.posY) {
+                    if (blackTiles[i].posX == piece.posX || blackTiles[i].posX == piece.posX - 2) {
+                        blackTiles[i].isPossibleMove = TRUE;
+
+                    }
+                }
+            }
+        }
+        else {
+            for(int i = 0; i<nbTiles; i++) {
+                if(blackTiles[i].posY == piece.posY - 2) {
+                    if (blackTiles[i].posX == piece.posX || blackTiles[i].posX == piece.posX - 2) {
+                        blackTiles[i].isPossibleMove = TRUE;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -156,14 +188,18 @@ int main(int argc, char *argv[]){
             }
             break;
         }
-         for(int i=0; i < board.nbPieces; i++){
+
+        resetValidMove(board, blackTiles);
+        for(int i=0; i < board.nbPieces; i++){
             if(whitePieces[i].isPicked == TRUE){
-                whitePieces[i].pickedPosX = event.button.x;
-                whitePieces[i].pickedPosY = event.button.y;
+                whitePieces[i].renderPosX = event.button.x;
+                whitePieces[i].renderPosY = event.button.y;
+                checkValidSimpleMove(whitePieces[i], board, blackTiles);
             }
             if(blackPieces[i].isPicked == TRUE){
-                blackPieces[i].pickedPosX = event.button.x;
-                blackPieces[i].pickedPosY = event.button.y;
+                blackPieces[i].renderPosX = event.button.x;
+                blackPieces[i].renderPosY = event.button.y;
+                checkValidSimpleMove(blackPieces[i], board, blackTiles);
             }
         }
         drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, yellow, blackTiles);

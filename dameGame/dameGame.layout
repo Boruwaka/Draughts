@@ -1,15 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
-	<ActiveTarget name="Debug" />
-	<File name="src\main.c" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
+	<ActiveTarget name="Release" />
+	<File name="include\graphicRendering.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2339" topLine="62" />
+			<Cursor1 position="8" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="src\graphicRendering.c" open="1" top="1" tabpos="4" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7361" topLine="179" />
 		</Cursor>
 		<Folding>
-			<Collapse line="48" />
-			<Collapse line="99" />
-			<Collapse line="140" />
+			<Collapse line="6" />
 		</Folding>
+	</File>
+	<File name="src\main.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2656" topLine="20" />
+		</Cursor>
+		<Folding>
+			<Collapse line="6" />
+			<Collapse line="51" />
+			<Collapse line="62" />
+		</Folding>
+	</File>
+	<File name="include\properties.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="537" topLine="22" />
+		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

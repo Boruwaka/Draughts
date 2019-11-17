@@ -21,8 +21,8 @@
 struct piece {
     int posY;
     int posX;
-    int pickedPosX;
-    int pickedPosY;
+    int renderPosX;
+    int renderPosY;
     int height;
     int width;
     int isPicked;
@@ -43,6 +43,8 @@ struct board {
 
 struct tile {
     SDL_Rect params;
+    int posX;
+    int posY;
     int isPossibleMove;
 };
 #endif // PROPERTIES_H_INCLUDED

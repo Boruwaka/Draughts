@@ -17,7 +17,7 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int w, int h){
 }
 
 int initGame(struct tile blackTiles[], int size) {
-    int nbTile = ((size*size) / 2);
+  //  int nbTile = ((size*size) / 2);
     int posX=0; int posY=0; int indexTab=0;
     for(int i = 0; i<(size * size); i++){
         if(((i + posY) % 2) != 0){
@@ -25,6 +25,8 @@ int initGame(struct tile blackTiles[], int size) {
             blackTiles[indexTab].params.y = 10 + posY*60;
             blackTiles[indexTab].params.h = 60;
             blackTiles[indexTab].params.w = 60;
+            blackTiles[indexTab].posX = posX;
+            blackTiles[indexTab].posY = posY;
             blackTiles[indexTab].isPossibleMove = FALSE;
             indexTab++;
         }
@@ -40,7 +42,7 @@ int initGame(struct tile blackTiles[], int size) {
     return 0;
 }
 
-int drawPickedPiece(SDL_Renderer *renderer, struct piece pieces[], struct board board, SDL_Texture *pieceImage) {
+int renderPickedPiece(SDL_Renderer *renderer, struct piece pieces[], struct board board, SDL_Texture *pieceImage) {
     SDL_Rect imageParams = {0, 0, 0, 0};
     SDL_Rect pieceParams = {0, 0, 0, 0};
     if(0 != SDL_QueryTexture(pieceImage, NULL, NULL, &imageParams.w, &imageParams.h)){
@@ -53,24 +55,24 @@ int drawPickedPiece(SDL_Renderer *renderer, struct piece pieces[], struct board 
         if(pieces[i].isPicked == TRUE) {
             pieceParams.h = pieces[i].height * 1.2;
             pieceParams.w = pieces[i].width * 1.2;
-            if(pieces[i].pickedPosX >= board.width - 15) {
+            if(pieces[i].renderPosX >= board.width - 15) {
                 pieceParams.x = board.width - OFFSET_WIDTH - 15;
             }
-            else if(pieces[i].pickedPosX <= 55) {
+            else if(pieces[i].renderPosX <= 55) {
                 pieceParams.x = 10;
             }
             else {
-                pieceParams.x = pieces[i].pickedPosX - OFFSET_WIDTH;
+                pieceParams.x = pieces[i].renderPosX - OFFSET_WIDTH;
             }
 
-            if(pieces[i].pickedPosY >= board.height - 10) {
+            if(pieces[i].renderPosY >= board.height - 10) {
                 pieceParams.y = board.width - OFFSET_HEIGHT - 10;
             }
-            else if(pieces[i].pickedPosY <= 55) {
+            else if(pieces[i].renderPosY <= 55) {
                 pieceParams.y = 10;
             }
             else {
-                pieceParams.y = pieces[i].pickedPosY - OFFSET_HEIGHT;
+                pieceParams.y = pieces[i].renderPosY - OFFSET_HEIGHT;
             }
             if(0 != SDL_RenderCopy(renderer, pieceImage, NULL, &pieceParams)){
                 fprintf(stderr, "Erreur SDL_RenderCopy : %s", SDL_GetError());
@@ -102,11 +104,11 @@ int drawGame(SDL_Renderer *renderer, struct piece whitePieces[], struct piece bl
         return -1;
     }
 
-     if(0 != drawPickedPiece(renderer, blackPieces, board, blackPieceImage)) {
+     if(0 != renderPickedPiece(renderer, blackPieces, board, blackPieceImage)) {
         fprintf(stderr, "Erreur renderPickedPiece : %s", SDL_GetError());
         return -1;
     }
-     if(0 != drawPickedPiece(renderer, whitePieces, board, whitePieceImage)) {
+     if(0 != renderPickedPiece(renderer, whitePieces, board, whitePieceImage)) {
         fprintf(stderr, "Erreur renderPickedPiece : %s", SDL_GetError());
         return -1;
     }
