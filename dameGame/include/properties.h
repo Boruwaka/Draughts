@@ -43,6 +43,6 @@ struct board {
 
 struct tile {
     SDL_Rect params;
-    int isPicked;
+    int isPossibleMove;
 };
 #endif // PROPERTIES_H_INCLUDED

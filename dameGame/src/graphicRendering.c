@@ -25,7 +25,7 @@ int initGame(struct tile blackTiles[], int size) {
             blackTiles[indexTab].params.y = 10 + posY*60;
             blackTiles[indexTab].params.h = 60;
             blackTiles[indexTab].params.w = 60;
-            blackTiles[indexTab].isPicked = FALSE;
+            blackTiles[indexTab].isPossibleMove = FALSE;
             indexTab++;
         }
 
@@ -35,6 +35,47 @@ int initGame(struct tile blackTiles[], int size) {
         }
         else{
             posX++;
+        }
+    }
+    return 0;
+}
+
+int drawPickedPiece(SDL_Renderer *renderer, struct piece pieces[], struct board board, SDL_Texture *pieceImage) {
+    SDL_Rect imageParams = {0, 0, 0, 0};
+    SDL_Rect pieceParams = {0, 0, 0, 0};
+    if(0 != SDL_QueryTexture(pieceImage, NULL, NULL, &imageParams.w, &imageParams.h)){
+        fprintf(stderr, "Erreur SDL_QueryTexture : %s", SDL_GetError());
+        return -1;
+    }
+
+    for(int i=0; i<board.nbPieces; i++) {
+
+        if(pieces[i].isPicked == TRUE) {
+            pieceParams.h = pieces[i].height * 1.2;
+            pieceParams.w = pieces[i].width * 1.2;
+            if(pieces[i].pickedPosX >= board.width - 15) {
+                pieceParams.x = board.width - OFFSET_WIDTH - 15;
+            }
+            else if(pieces[i].pickedPosX <= 55) {
+                pieceParams.x = 10;
+            }
+            else {
+                pieceParams.x = pieces[i].pickedPosX - OFFSET_WIDTH;
+            }
+
+            if(pieces[i].pickedPosY >= board.height - 10) {
+                pieceParams.y = board.width - OFFSET_HEIGHT - 10;
+            }
+            else if(pieces[i].pickedPosY <= 55) {
+                pieceParams.y = 10;
+            }
+            else {
+                pieceParams.y = pieces[i].pickedPosY - OFFSET_HEIGHT;
+            }
+            if(0 != SDL_RenderCopy(renderer, pieceImage, NULL, &pieceParams)){
+                fprintf(stderr, "Erreur SDL_RenderCopy : %s", SDL_GetError());
+                return -1;
+            }
         }
     }
     return 0;
@@ -61,6 +102,14 @@ int drawGame(SDL_Renderer *renderer, struct piece whitePieces[], struct piece bl
         return -1;
     }
 
+     if(0 != drawPickedPiece(renderer, blackPieces, board, blackPieceImage)) {
+        fprintf(stderr, "Erreur renderPickedPiece : %s", SDL_GetError());
+        return -1;
+    }
+     if(0 != drawPickedPiece(renderer, whitePieces, board, whitePieceImage)) {
+        fprintf(stderr, "Erreur renderPickedPiece : %s", SDL_GetError());
+        return -1;
+    }
     SDL_RenderPresent(renderer);
     return 0;
 }
@@ -118,7 +167,7 @@ int drawBoard(SDL_Renderer *renderer, struct board board, struct tile blackTiles
     int nbTiles = ((board.size * board.size) / 2);
 
     for(int i = 0; i<nbTiles; i++){
-        if(blackTiles[i].isPicked == TRUE) {
+        if(blackTiles[i].isPossibleMove == TRUE) {
             if(0 != SDL_SetRenderDrawColor(renderer, board.colorPicked.r, board.colorPicked.g, board.colorPicked.b, board.colorPicked.a)){
                 fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
                 return -1;
@@ -151,30 +200,7 @@ int drawPieces(SDL_Renderer *renderer, struct piece pieces[], struct board board
 
     for(int i=0; i<board.nbPieces; i++) {
 
-        if(pieces[i].isPicked == TRUE) {
-            pieceParams.h = pieces[i].height * 1.2;
-            pieceParams.w = pieces[i].width * 1.2;
-            if(pieces[i].pickedPosX >= board.width - 15) {
-                pieceParams.x = board.width - OFFSET_WIDTH - 15;
-            }
-            else if(pieces[i].pickedPosX <= 55) {
-                pieceParams.x = 10;
-            }
-            else {
-                pieceParams.x = pieces[i].pickedPosX - OFFSET_WIDTH;
-            }
-
-            if(pieces[i].pickedPosY >= board.height - 10) {
-                pieceParams.y = board.width - OFFSET_HEIGHT - 10;
-            }
-            else if(pieces[i].pickedPosY <= 55) {
-                pieceParams.y = 10;
-            }
-            else {
-                pieceParams.y = pieces[i].pickedPosY - OFFSET_HEIGHT;
-            }
-        }
-        else {
+        if(pieces[i].isPicked != TRUE) {
             pieceParams.w = pieces[i].width;
             pieceParams.h = pieces[i].height;
             pieceParams.x = (((pieces[i].width + SPACING_WIDTH) * pieces[i].posX) - OFFSET_WIDTH);

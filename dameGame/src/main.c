@@ -70,7 +70,7 @@ int main(int argc, char *argv[]){
     freopen("stdout.txt", "w", stdout);
     freopen("stderr.txt", "w", stderr);
     int gameState = CONTINUE;
-    int currentPlayer = BLACK;
+    int currentPlayer = WHITE;
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
     int statut = 0;
@@ -123,16 +123,10 @@ int main(int argc, char *argv[]){
 
     initPieces(whitePieces, board.nbPieces, WHITE, board.size);
     initPieces(blackPieces, board.nbPieces, BLACK, board.size);
-    for(int i = 0; i<board.nbPieces; i++) {
-        printf("%d : %d \t%d \t%d \t%d", i, whitePieces[i].isQueen, whitePieces[i].color, whitePieces[i].posY, whitePieces[i].posX);
-        printf(" ||| %d \t%d \t%d \t%d", blackPieces[i].isQueen, blackPieces[i].color, blackPieces[i].posY, blackPieces[i].posX);
-        printf("\n");
-    }
 
     drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, yellow, blackTiles);
 
     SDL_Event event;
-
     do {
         SDL_WaitEvent(&event);
         switch(event.type){
@@ -174,15 +168,6 @@ int main(int argc, char *argv[]){
         }
         drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, yellow, blackTiles);
     }while(gameState == CONTINUE);
-
-     do {
-        SDL_WaitEvent(&event);
-        switch(event.type){
-        case SDL_QUIT :
-            goto Quit;
-            break;
-            }
-        }while(1);
 
     Quit:
     if(NULL != whitePieceImage)

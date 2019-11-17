@@ -10,6 +10,7 @@ int setWindowColor(SDL_Renderer *, SDL_Color);
 SDL_Texture* loadImage(const char[], SDL_Renderer *);
 int drawBoard(SDL_Renderer *, struct board, struct tile[]);
 int drawPieces(SDL_Renderer *, struct piece[], struct board, SDL_Texture *);
+int drawPickedPiece(SDL_Renderer *, struct piece[], struct board, SDL_Texture *);
 
 int initGame(struct tile[], int);
 
