@@ -51,7 +51,7 @@ void initPieces(struct piece pieces[], int nbPieces, int color, int boardSize) {
     }while(pieceIndex != nbPieces);
 }
 
-void initMovement(struct piece pieces[], int nbPieces,SDL_Event event) {
+void initMovement(struct piece pieces[], int nbPieces, SDL_Event event) {
     for(int i=0; i < nbPieces; i++){
         if(event.button.y < ((pieces[i].height + SPACING_HEIGHT) * pieces[i].posY)
         && event.button.y > ((pieces[i].height + SPACING_HEIGHT) * pieces[i].posY) - OFFSET_HEIGHT
@@ -87,32 +87,66 @@ int checkIfTileOccupated(struct tile blackTile, struct board board, struct piece
     return FALSE;
 }
 
+int isSameTile(struct tile defaultTile, struct tile tile) {
+    if(
+       defaultTile.isPossibleMove == tile.isPossibleMove
+       && defaultTile.posX == tile.posX
+       && defaultTile.posY == tile.posY
+       && defaultTile.params.h == tile.params.h
+       && defaultTile.params.w == tile.params.w
+       && defaultTile.params.x == tile.params.x
+       && defaultTile.params.y == tile.params.y
+    ) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void checkValidSimpleMove(struct piece piece, struct board board, struct tile blackTiles[], struct piece whitePieces[], struct piece blackPieces[]) {
     int nbTiles = ((board.size * board.size) / 2);
+    int offsetY = (piece.color == WHITE) ? -1 : +1 ;
     if(piece.isQueen == FALSE) {
-        if(piece.color == WHITE) {
-            for(int i = 0; i<nbTiles; i++) {
-                if(blackTiles[i].posY-1 == piece.posY) {
-                    if (blackTiles[i].posX == piece.posX || blackTiles[i].posX == piece.posX - 2) {
-                        if(TRUE == checkIfTileOccupated(blackTiles[i], board, whitePieces, blackPieces)) {
-                            blackTiles[i].isPossibleMove = FALSE;
-                        }
-                        else {
-                            blackTiles[i].isPossibleMove = TRUE;
-                        }
+        for(int i = 0; i<nbTiles; i++) {
+            if(blackTiles[i].posY +offsetY == piece.posY) {
+                if (blackTiles[i].posX == piece.posX || blackTiles[i].posX == piece.posX - 2) {
+                    if(TRUE == checkIfTileOccupated(blackTiles[i], board, whitePieces, blackPieces)) {
+                        blackTiles[i].isPossibleMove = FALSE;
+                    }
+                    else {
+                        blackTiles[i].isPossibleMove = TRUE;
                     }
                 }
             }
         }
-        else {
-            for(int i = 0; i<nbTiles; i++) {
-                if(blackTiles[i].posY == piece.posY - 2) {
-                    if (blackTiles[i].posX == piece.posX || blackTiles[i].posX == piece.posX - 2) {
-                        blackTiles[i].isPossibleMove = TRUE;
-                        checkIfTileOccupated(blackTiles[i], board, whitePieces, blackPieces);
-                    }
-                }
+    }
+}
+
+struct tile isValidDeplacement(struct board board, struct tile blackTiles[], SDL_Event event) {
+    int size = ((board.size * board.size) / 2);
+    //printf("\n\nEvent : x: %d - y: %d\n", event.button.x, event.button.y);
+    for(int i=0; i < size; i++){
+        if(blackTiles[i].isPossibleMove == TRUE) {
+            if(event.button.x < (blackTiles[i].params.x + blackTiles[i].params.w) &&
+            (event.button.x > (blackTiles[i].params.x )) &&
+            (event.button.y < (blackTiles[i].params.y + blackTiles[i].params.h)) &&
+            (event.button.y > (blackTiles[i].params.y ))) {
+               /* printf("Tile : x-top: %d - x-bot: %d   ///   y-top: %d - y-bot: %d\n",
+                   (blackTiles[i].params.x + blackTiles[i].params.w),
+                   (blackTiles[i].params.x ),
+                   (blackTiles[i].params.y + blackTiles[i].params.h),
+                   (blackTiles[i].params.y ));*/
+                return blackTiles[i];
             }
+        }
+    }
+}
+
+void movePieceInNewTile(struct tile tile, struct piece pieces[], struct tile blackTiles[], struct board board) {
+    int size = ((board.size * board.size) / 2);
+    for(int i=0; i < board.nbPieces; i++){
+        if(pieces[i].isPicked == TRUE) {
+            pieces[i].posY = tile.posY;
+            pieces[i].posX = tile.posX+1;
         }
     }
 }
@@ -198,12 +232,23 @@ int main(int argc, char *argv[]){
 
         case SDL_MOUSEBUTTONUP :
             if(event.button.button == SDL_BUTTON_LEFT){
-                if(currentPlayer == WHITE) {
-                    endMovement(whitePieces, board.nbPieces);
+                struct tile tileDrop = {-1, -1, -1, -1, -1, -1, FALSE};
+                struct tile defaultTile = {-1, -1, -1, -1, -1, -1, FALSE};
+                tileDrop = isValidDeplacement(board, blackTiles, event);
+
+                if(FALSE == isSameTile(defaultTile, tileDrop)) {
+                    if(currentPlayer == WHITE) {
+                        movePieceInNewTile(tileDrop, whitePieces, blackTiles, board);
+                        currentPlayer = BLACK;
+                    }
+                    else {
+                        movePieceInNewTile(tileDrop, blackPieces, blackTiles, board);
+                        currentPlayer = WHITE;
+                    }
                 }
-                else {
-                    endMovement(blackPieces, board.nbPieces);
-                }
+
+                endMovement(whitePieces, board.nbPieces);
+                endMovement(blackPieces, board.nbPieces);
             }
             break;
         }
