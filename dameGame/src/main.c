@@ -51,13 +51,14 @@ void initPieces(struct piece pieces[], int nbPieces, int color, int boardSize) {
     }while(pieceIndex != nbPieces);
 }
 
-void initMovement(struct piece pieces[], int nbPieces, SDL_Event event) {
+struct piece initMovement(struct piece pieces[], int nbPieces, SDL_Event event) {
     for(int i=0; i < nbPieces; i++){
         if(event.button.y < ((pieces[i].height + SPACING_HEIGHT) * pieces[i].posY)
         && event.button.y > ((pieces[i].height + SPACING_HEIGHT) * pieces[i].posY) - OFFSET_HEIGHT
         && event.button.x < ((pieces[i].width + SPACING_WIDTH) * pieces[i].posX)
         && event.button.x > ((pieces[i].width + SPACING_WIDTH) * pieces[i].posX) - OFFSET_WIDTH) {
             pieces[i].isPicked = TRUE;
+            return pieces[i];
         }
     }
 }
@@ -87,6 +88,18 @@ int checkIfTileOccupated(struct tile blackTile, struct board board, struct piece
     return FALSE;
 }
 
+int colorOfPieceOnTile(struct tile blackTile, struct board board, struct piece whitePieces[], struct piece blackPieces[]) {
+    for(int i=0; i<board.nbPieces; i++) {
+        if((whitePieces[i].posX == blackTile.posX+1) && (whitePieces[i].posY == blackTile.posY)) {
+            return WHITE.;
+        }
+        if((blackPieces[i].posX == blackTile.posX+1) && (blackPieces[i].posY == blackTile.posY)) {
+            return BLACK;
+        }
+    }
+    return -1;
+}
+
 int isSameTile(struct tile defaultTile, struct tile tile) {
     if(
        defaultTile.isPossibleMove == tile.isPossibleMove
@@ -102,17 +115,31 @@ int isSameTile(struct tile defaultTile, struct tile tile) {
     return FALSE;
 }
 
+int isSamePiece(struct piece defaultPiece, struct piece piece) {
+    if(
+    defaultPiece.posY == piece.posY
+        && defaultPiece.posX == piece.posX
+        && defaultPiece.renderPosX == piece.renderPosX
+        && defaultPiece.renderPosY == piece.renderPosY
+        && defaultPiece.height == piece.height
+        && defaultPiece.width == piece.width
+        && defaultPiece.isPicked == piece.isPicked
+        && defaultPiece.isQueen == piece.isQueen
+        && defaultPiece.color == piece.color
+    ) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void checkValidSimpleMove(struct piece piece, struct board board, struct tile blackTiles[], struct piece whitePieces[], struct piece blackPieces[]) {
     int nbTiles = ((board.size * board.size) / 2);
-    int offsetY = (piece.color == WHITE) ? -1 : +1 ;
+    int offsetY = (piece.color == WHITE) ? 1 : -1 ;
     if(piece.isQueen == FALSE) {
         for(int i = 0; i<nbTiles; i++) {
-            if(blackTiles[i].posY +offsetY == piece.posY) {
+            if(blackTiles[i].posY == piece.posY + offsetY) {
                 if (blackTiles[i].posX == piece.posX || blackTiles[i].posX == piece.posX - 2) {
-                    if(TRUE == checkIfTileOccupated(blackTiles[i], board, whitePieces, blackPieces)) {
-                        blackTiles[i].isPossibleMove = FALSE;
-                    }
-                    else {
+                    if(FALSE == checkIfTileOccupated(blackTiles[i], board, whitePieces, blackPieces)) {
                         blackTiles[i].isPossibleMove = TRUE;
                     }
                 }
@@ -121,7 +148,27 @@ void checkValidSimpleMove(struct piece piece, struct board board, struct tile bl
     }
 }
 
+void checkValidTakeMove(struct piece piece, struct board board, struct tile blackTiles[], struct piece whitePieces[], struct piece blackPieces[]) {
+    int nbTiles = ((board.size * board.size) / 2);
+    int offsetBeforeY = -1;
+    int offsetAfterY = 1;
+    if(piece.isQueen == FALSE) {
+        for(int i = 0; i<nbTiles; i++) {
+            if(blackTiles[i].posY == piece.posY + offsetY) {
+                if (blackTiles[i].posX == piece.posX || blackTiles[i].posX == piece.posX - 2) {
+                    int colorOfPiece = colorOfPieceOnTile(blackTiles[i], board, whitePieces, blackPieces);
+                    if(FALSE == colorOfPiece) {
+                        return
+                    }
+
+                    if()
+                }
+            }
+        }
+    }
+}
 struct tile isValidDeplacement(struct board board, struct tile blackTiles[], SDL_Event event) {
+    struct tile defaultTile = {-1, -1, -1, -1, -1, -1, FALSE};
     int size = ((board.size * board.size) / 2);
     //printf("\n\nEvent : x: %d - y: %d\n", event.button.x, event.button.y);
     for(int i=0; i < size; i++){
@@ -139,10 +186,10 @@ struct tile isValidDeplacement(struct board board, struct tile blackTiles[], SDL
             }
         }
     }
+    return defaultTile;
 }
 
 void movePieceInNewTile(struct tile tile, struct piece pieces[], struct tile blackTiles[], struct board board) {
-    int size = ((board.size * board.size) / 2);
     for(int i=0; i < board.nbPieces; i++){
         if(pieces[i].isPicked == TRUE) {
             pieces[i].posY = tile.posY;
@@ -221,11 +268,21 @@ int main(int argc, char *argv[]){
 
         case SDL_MOUSEBUTTONDOWN :
             if(event.button.button == SDL_BUTTON_LEFT){
+                struct piece takenPiece = {-1, -1, -1, -1, -1, -1, FALSE, FALSE, BLACK};
+                struct piece defaultPiece = {-1, -1, -1, -1, -1, -1, FALSE, FALSE, BLACK};
+
                 if(currentPlayer == WHITE) {
-                    initMovement(whitePieces, board.nbPieces, event);
+                    takenPiece = initMovement(whitePieces, board.nbPieces, event);
+                    if(FALSE == isSamePiece(defaultPiece, takenPiece)) {
+                        checkValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                        checkValidTakeMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                    }
                 }
                 else {
-                    initMovement(blackPieces, board.nbPieces, event);
+                    takenPiece = initMovement(blackPieces, board.nbPieces, event);
+                    if(FALSE == isSamePiece(defaultPiece, takenPiece)) {
+                        checkValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                    }
                 }
             }
             break;
@@ -247,23 +304,21 @@ int main(int argc, char *argv[]){
                     }
                 }
 
+                resetValidMove(board, blackTiles);
                 endMovement(whitePieces, board.nbPieces);
                 endMovement(blackPieces, board.nbPieces);
             }
             break;
         }
 
-        resetValidMove(board, blackTiles);
         for(int i=0; i < board.nbPieces; i++){
             if(whitePieces[i].isPicked == TRUE){
                 whitePieces[i].renderPosX = event.button.x;
                 whitePieces[i].renderPosY = event.button.y;
-                checkValidSimpleMove(whitePieces[i], board, blackTiles, whitePieces, blackPieces);
             }
             if(blackPieces[i].isPicked == TRUE){
                 blackPieces[i].renderPosX = event.button.x;
                 blackPieces[i].renderPosY = event.button.y;
-                checkValidSimpleMove(blackPieces[i], board, blackTiles, whitePieces, blackPieces);
             }
         }
         drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, yellow, blackTiles);
