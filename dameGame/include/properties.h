@@ -26,6 +26,7 @@ struct piece {
     int height;
     int width;
     int isPicked;
+    int isDeath;
     int isQueen;
     int color;
 };

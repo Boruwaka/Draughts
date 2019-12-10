@@ -202,7 +202,7 @@ int drawPieces(SDL_Renderer *renderer, struct piece pieces[], struct board board
 
     for(int i=0; i<board.nbPieces; i++) {
 
-        if(pieces[i].isPicked != TRUE) {
+        if(pieces[i].isPicked != TRUE && pieces[i].isDeath != TRUE) {
             pieceParams.w = pieces[i].width;
             pieceParams.h = pieces[i].height;
             pieceParams.x = (((pieces[i].width + SPACING_WIDTH) * pieces[i].posX) - OFFSET_WIDTH);
