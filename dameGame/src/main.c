@@ -28,7 +28,7 @@ void initPieces(struct piece pieces[], int nbPieces, int color, int boardSize) {
 
     do{
         if(((posX + posY) % 2) != 0){
-            pieces[pieceIndex].isQueen = TRUE;
+            pieces[pieceIndex].isQueen = FALSE;
             pieces[pieceIndex].isDeath = FALSE;
             pieces[pieceIndex].color = color;
             pieces[pieceIndex].isPicked = FALSE;
@@ -374,7 +374,7 @@ int main(int argc, char *argv[]){
     struct board board;
     board.posX = 5;
     board.posY = 5;
-    board.size = 10;
+    board.size = 8;
     board.colorDefault.r = 100;
     board.colorDefault.g = 100;
     board.colorDefault.b = 100;
