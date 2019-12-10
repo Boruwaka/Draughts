@@ -38,7 +38,11 @@ void initPieces(struct piece pieces[], int nbPieces, int color, int boardSize) {
             pieces[pieceIndex].width = WIDTH_PIECE;
             pieces[pieceIndex].renderPosX = 0;
             pieces[pieceIndex].renderPosY = 0;
+            /*if(posX == 3 && posY == 4) {
+                pieces[pieceIndex].isQueen = TRUE;
+            }*/
             pieceIndex++;
+
         }
 
 
@@ -137,13 +141,11 @@ int isSamePiece(struct piece defaultPiece, struct piece piece) {
 void checkValidSimpleMove(struct piece piece, struct board board, struct tile blackTiles[], struct piece whitePieces[], struct piece blackPieces[]) {
     int nbTiles = ((board.size * board.size) / 2);
     int offsetY = (piece.color == WHITE) ? 1 : -1 ;
-    if(piece.isQueen == FALSE) {
-        for(int i = 0; i<nbTiles; i++) {
-            if(blackTiles[i].posY == piece.posY + offsetY) {
-                if (blackTiles[i].posX == piece.posX || blackTiles[i].posX == piece.posX - 2) {
-                    if(FALSE == checkIfTileOccupated(blackTiles[i], board, whitePieces, blackPieces)) {
-                        blackTiles[i].isPossibleMove = TRUE;
-                    }
+    for(int i = 0; i<nbTiles; i++) {
+        if(blackTiles[i].posY == piece.posY + offsetY) {
+            if (blackTiles[i].posX == piece.posX || blackTiles[i].posX == piece.posX - 2) {
+                if(FALSE == checkIfTileOccupated(blackTiles[i], board, whitePieces, blackPieces)) {
+                    blackTiles[i].isPossibleMove = TRUE;
                 }
             }
         }
@@ -281,6 +283,19 @@ void initKillPiece(struct tile dropTile, struct piece currentPieces[], struct pi
     }
 }
 
+void upgradeToQueen(struct tile tileDrop, struct piece pieces[], struct board board) {
+    for(int i=0; i<board.nbPieces; i++) {
+        if(pieces[i].isPicked == TRUE) {
+            if((pieces[i].color == WHITE) && (tileDrop.posY == board.size)) {
+                pieces[i].isQueen = TRUE;
+            }
+            else if((pieces[i].color == BLACK) && (tileDrop.posY == 1)) {
+                pieces[i].isQueen = TRUE;
+            }
+        }
+    }
+}
+
 int main(int argc, char *argv[]){
     freopen("stdout.txt", "w", stdout);
     freopen("stderr.txt", "w", stderr);
@@ -293,7 +308,7 @@ int main(int argc, char *argv[]){
     struct board board;
     board.posX = 5;
     board.posY = 5;
-    board.size = 10;
+    board.size = 8;
     board.colorDefault.r = 100;
     board.colorDefault.g = 100;
     board.colorDefault.b = 100;
@@ -335,11 +350,15 @@ int main(int argc, char *argv[]){
     whitePieceImage = loadImage("assets/whitePiece.bmp", renderer);
     SDL_Texture *blackPieceImage = NULL;
     blackPieceImage = loadImage("assets/blackPiece.bmp", renderer);
+    SDL_Texture *blackQueenImage = NULL;
+    blackQueenImage = loadImage("assets/blackQueen.bmp", renderer);
+    SDL_Texture *whiteQueenImage = NULL;
+    whiteQueenImage = loadImage("assets/whiteQueen.bmp", renderer);
 
     initPieces(whitePieces, board.nbPieces, WHITE, board.size);
     initPieces(blackPieces, board.nbPieces, BLACK, board.size);
 
-    drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, yellow, blackTiles);
+    drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, whiteQueenImage, blackQueenImage, yellow, blackTiles);
 
     SDL_Event event;
     do {
@@ -380,11 +399,13 @@ int main(int argc, char *argv[]){
                 if(FALSE == isSameTile(defaultTile, tileDrop)) {
                     if(currentPlayer == WHITE) {
                         initKillPiece(tileDrop, whitePieces, blackPieces, blackTiles, board);
+                        upgradeToQueen(tileDrop, whitePieces, board);
                         movePieceInNewTile(tileDrop, whitePieces, blackTiles, board);
                         currentPlayer = BLACK;
                     }
                     else {
                         initKillPiece(tileDrop, blackPieces, whitePieces, blackTiles, board);
+                        upgradeToQueen(tileDrop, blackPieces, board);
                         movePieceInNewTile(tileDrop, blackPieces, blackTiles, board);
                         currentPlayer = WHITE;
                     }
@@ -407,7 +428,7 @@ int main(int argc, char *argv[]){
                 blackPieces[i].renderPosY = event.button.y;
             }
         }
-        drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, yellow, blackTiles);
+        drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, whiteQueenImage, blackQueenImage, yellow, blackTiles);
     }while(gameState == CONTINUE);
 
     Quit:
@@ -415,6 +436,10 @@ int main(int argc, char *argv[]){
         SDL_DestroyTexture(whitePieceImage);
     if(NULL != blackPieceImage)
         SDL_DestroyTexture(blackPieceImage);
+    if(NULL != whiteQueenImage)
+        SDL_DestroyTexture(whiteQueenImage);
+    if(NULL != blackQueenImage)
+        SDL_DestroyTexture(blackQueenImage);
     if(NULL != renderer)
         SDL_DestroyRenderer(renderer);
     if(NULL != window)
