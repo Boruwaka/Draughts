@@ -28,7 +28,7 @@ void initPieces(struct piece pieces[], int nbPieces, int color, int boardSize) {
 
     do{
         if(((posX + posY) % 2) != 0){
-            pieces[pieceIndex].isQueen = FALSE;
+            pieces[pieceIndex].isQueen = TRUE;
             pieces[pieceIndex].isDeath = FALSE;
             pieces[pieceIndex].color = color;
             pieces[pieceIndex].isPicked = FALSE;
@@ -147,6 +147,72 @@ void checkValidSimpleMove(struct piece piece, struct board board, struct tile bl
                 if(FALSE == checkIfTileOccupated(blackTiles[i], board, whitePieces, blackPieces)) {
                     blackTiles[i].isPossibleMove = TRUE;
                 }
+            }
+        }
+    }
+}
+
+struct tile* getTileFromCoordonate(struct tile blackTiles[], int posX, int posY, int nbTiles) {
+    for(int i=0; i< nbTiles; i++) {
+        if(blackTiles[i].posX == posX && blackTiles[i].posY == posY) {
+            return &blackTiles[i];
+        }
+    }
+    return NULL;
+}
+
+void checkQueenValidSimpleMove(struct piece piece, struct board board, struct tile blackTiles[], struct piece whitePieces[], struct piece blackPieces[]) {
+    int nbTiles = ((board.size * board.size) / 2);
+    struct tile *currentTile;
+
+    // Diagonale bottom left
+    for(int i = 1; i<nbTiles; i++) {
+        currentTile = getTileFromCoordonate(blackTiles, piece.posX - i-1, piece.posY + i, nbTiles);
+        if (currentTile != NULL) {
+            if( checkIfTileOccupated(*currentTile, board, whitePieces, blackPieces) == FALSE) {
+                currentTile->isPossibleMove = TRUE;
+            }
+            else {
+                break;
+            }
+        }
+    }
+
+    // Diagonale bottom right
+    for(int i = 1; i<nbTiles; i++) {
+        currentTile = getTileFromCoordonate(blackTiles, piece.posX + i-1, piece.posY + i, nbTiles);
+        if (currentTile != NULL) {
+            if( checkIfTileOccupated(*currentTile, board, whitePieces, blackPieces) == FALSE) {
+                currentTile->isPossibleMove = TRUE;
+            }
+            else {
+                break;
+            }
+        }
+    }
+
+    // Diagonale top left
+    for(int i = 1; i<nbTiles; i++) {
+        currentTile = getTileFromCoordonate(blackTiles, piece.posX - i-1, piece.posY - i, nbTiles);
+        if (currentTile != NULL) {
+            if( checkIfTileOccupated(*currentTile, board, whitePieces, blackPieces) == FALSE) {
+                currentTile->isPossibleMove = TRUE;
+            }
+            else {
+                break;
+            }
+        }
+    }
+
+    // Diagonale top right
+    for(int i = 1; i<nbTiles; i++) {
+        currentTile = getTileFromCoordonate(blackTiles, piece.posX + i-1, piece.posY - i, nbTiles);
+        if (currentTile != NULL) {
+            if( checkIfTileOccupated(*currentTile, board, whitePieces, blackPieces) == FALSE) {
+                currentTile->isPossibleMove = TRUE;
+            }
+            else {
+                break;
             }
         }
     }
@@ -308,7 +374,7 @@ int main(int argc, char *argv[]){
     struct board board;
     board.posX = 5;
     board.posY = 5;
-    board.size = 8;
+    board.size = 10;
     board.colorDefault.r = 100;
     board.colorDefault.g = 100;
     board.colorDefault.b = 100;
@@ -376,15 +442,25 @@ int main(int argc, char *argv[]){
                 if(currentPlayer == WHITE) {
                     takenPiece = initMovement(whitePieces, board.nbPieces, event, defaultPiece);
                     if(FALSE == isSamePiece(defaultPiece, takenPiece)) {
-                        checkValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
-                        checkValidTakeMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                        if(takenPiece.isQueen == FALSE) {
+                            checkValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                            checkValidTakeMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                        }
+                        else {
+                            checkQueenValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                        }
                     }
                 }
                 else if (currentPlayer == BLACK) {
                     takenPiece = initMovement(blackPieces, board.nbPieces, event, defaultPiece);
                     if(FALSE == isSamePiece(defaultPiece, takenPiece)) {
-                        checkValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
-                        checkValidTakeMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                        if(takenPiece.isQueen == FALSE) {
+                            checkValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                            checkValidTakeMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                        }
+                        else{
+                            checkQueenValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                        }
                     }
                 }
             }
