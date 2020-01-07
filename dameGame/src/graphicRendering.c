@@ -16,32 +16,6 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int w, int h){
     return 0;
 }
 
-int initGame(struct tile blackTiles[], int size) {
-  //  int nbTile = ((size*size) / 2);
-    int posX=1; int posY=1; int indexTab=0;
-    for(int i = 0; i<(size * size); i++){
-        if(((i + posY) % 2) != 0){
-            blackTiles[indexTab].params.x = 10 + posX*60;
-            blackTiles[indexTab].params.y = 10 + posY*60 - 60;
-            blackTiles[indexTab].params.h = 60;
-            blackTiles[indexTab].params.w = 60;
-            blackTiles[indexTab].posX = posX;
-            blackTiles[indexTab].posY = posY;
-            blackTiles[indexTab].isPossibleMove = FALSE;
-            indexTab++;
-        }
-
-        if(posX == (size-1)){
-            posX = 0;
-            posY++;
-        }
-        else{
-            posX++;
-        }
-    }
-    return 0;
-}
-
 int renderPickedPiece(SDL_Renderer *renderer, struct piece pieces[], struct board board, SDL_Texture *pieceImage, SDL_Texture *queenImage) {
     SDL_Rect imageParams = {0, 0, 0, 0};
     SDL_Rect pieceParams = {0, 0, 0, 0};

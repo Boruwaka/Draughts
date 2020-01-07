@@ -1,2 +1,6 @@
 stderr.txt
 stdout.txt
+*.o
+*.exe
+*.db
+*.zip

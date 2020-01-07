@@ -10,6 +10,16 @@
 #define BLACK 1
 #define WHITE 2
 
+#define UP 2
+#define DOWN 3
+#define RIGHT 5
+#define LEFT 7
+
+#define UP_RIGHT 10
+#define UP_LEFT 17
+#define DOWN_RIGHT 15
+#define DOWN_LEFT 21
+
 #define SPACING_HEIGHT 12
 #define SPACING_WIDTH 6
 #define OFFSET_HEIGHT 45
@@ -18,7 +28,7 @@
 #define WIDTH_PIECE 54
 #define HEIGHT_PIECE 48
 
-struct piece {
+typedef struct piece {
     int posY;
     int posX;
     int renderPosX;
@@ -29,9 +39,9 @@ struct piece {
     int isDeath;
     int isQueen;
     int color;
-};
+} piece;
 
-struct board {
+typedef struct board {
     int posX;
     int posY;
     int height;
@@ -40,12 +50,12 @@ struct board {
     int nbPieces;
     SDL_Color colorDefault;
     SDL_Color colorPicked;
-};
+} board;
 
-struct tile {
+typedef struct tile {
     SDL_Rect params;
     int posX;
     int posY;
     int isPossibleMove;
-};
+} tile;
 #endif // PROPERTIES_H_INCLUDED
