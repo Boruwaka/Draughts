@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "properties.h"
 #include "graphicRendering.h"
 
@@ -9,7 +10,11 @@ int initWindow(SDL_Window **window, SDL_Renderer **renderer, int w, int h){
         fprintf(stderr, "Erreur SDL_Init : %s", SDL_GetError());
         return -1;
     }
-    if(0 != SDL_CreateWindowAndRenderer(w, h, SDL_WINDOW_SHOWN, window, renderer)){
+    if(0 != TTF_Init()){
+        fprintf(stderr, "Erreur TTF_Init : %s", SDL_GetError());
+        return -1;
+    }
+    if(0 != SDL_CreateWindowAndRenderer(w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_MAXIMIZED, window, renderer)){
         fprintf(stderr, "Erreur SDL_CreateWindowAndRenderer : %s", SDL_GetError());
         return -1;
     }
@@ -102,7 +107,44 @@ int drawGame(SDL_Renderer *renderer, struct piece whitePieces[],
         fprintf(stderr, "Erreur renderPickedPiece : %s", SDL_GetError());
         return -1;
     }
+
+    return 0;
+}
+
+int updateView(SDL_Renderer *renderer) {
     SDL_RenderPresent(renderer);
+    return 0;
+}
+
+int drawInfos(SDL_Renderer *renderer
+              , struct board board
+              , SDL_Texture *textureTxt
+              , int currentPlayer
+              , SDL_Texture *blackPieceImage
+              , SDL_Texture *whitePieceImage) {
+    int texW = 0;
+    int texH = 0;
+    SDL_QueryTexture(textureTxt, NULL, NULL, &texW, &texH);
+    SDL_Rect dstrect = { board.size * 60 + OFFSET_WIDTH, 10, texW, texH };
+    SDL_RenderCopy(renderer, textureTxt, NULL, &dstrect);
+
+    SDL_Rect pieceParams = {0, 0, 0, 0};
+    SDL_Texture *pieceToRender = NULL;
+    pieceParams.w = WIDTH_PIECE;
+    pieceParams.h = HEIGHT_PIECE;
+    pieceParams.x = board.size * 60 + OFFSET_WIDTH + texW;
+    pieceParams.y = 20;
+    if(currentPlayer == WHITE) {
+        pieceToRender = whitePieceImage;
+    }
+    else {
+        pieceToRender = blackPieceImage;
+    }
+    if(0 != SDL_RenderCopy(renderer, pieceToRender, NULL, &pieceParams)){
+        fprintf(stderr, "Erreur SDL_RenderCopy : %s", SDL_GetError());
+        return -1;
+    }
+
     return 0;
 }
 
@@ -112,6 +154,30 @@ int setWindowColor(SDL_Renderer *renderer, SDL_Color color){
     if(SDL_RenderClear(renderer) < 0)
         return -1;
     return 0;
+}
+
+SDL_Texture *loadText(const char fontPath[], SDL_Renderer *renderer, char sentence[], SDL_Color color){
+    TTF_Font * font = TTF_OpenFont(fontPath, 50);
+    SDL_Surface *tmp = NULL;
+    SDL_Texture *texture = NULL;
+    tmp = TTF_RenderText_Solid(font, sentence, color);
+
+    if(NULL == tmp)
+    {
+        fprintf(stderr, "Erreur TTF_RenderText_Solid : %s", SDL_GetError());
+        TTF_CloseFont(font);
+        return NULL;
+    }
+    texture = SDL_CreateTextureFromSurface(renderer, tmp);
+    SDL_FreeSurface(tmp);
+    if(NULL == texture)
+    {
+        fprintf(stderr, "Erreur SDL_CreateTextureFromSurface : %s", SDL_GetError());
+        TTF_CloseFont(font);
+        return NULL;
+    }
+    TTF_CloseFont(font);
+    return texture;
 }
 
 SDL_Texture *loadImage(const char path[], SDL_Renderer *renderer){
@@ -184,15 +250,6 @@ int drawBoard(SDL_Renderer *renderer, struct board board, struct tile blackTiles
 int drawPieces(SDL_Renderer *renderer, struct piece pieces[], struct board board, SDL_Texture *pieceImage, SDL_Texture *queenImage){
     SDL_Rect imageParams = {0, 0, 0, 0};
     SDL_Rect pieceParams = {0, 0, 0, 0};
-
-    if(0 != SDL_QueryTexture(pieceImage, NULL, NULL, &imageParams.w, &imageParams.h)){
-        fprintf(stderr, "Erreur SDL_QueryTexture : %s", SDL_GetError());
-        return -1;
-    }
-    if(0 != SDL_QueryTexture(queenImage, NULL, NULL, &imageParams.w, &imageParams.h)){
-        fprintf(stderr, "Erreur SDL_QueryTexture : %s", SDL_GetError());
-        return -1;
-    }
 
     for(int i=0; i<board.nbPieces; i++) {
 

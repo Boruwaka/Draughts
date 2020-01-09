@@ -28,6 +28,7 @@ int main(int argc, char *argv[]){
 
     SDL_Color yellow = {255, 240, 140, 0};
     SDL_Color green = {40, 150, 40, 0};
+    SDL_Color black = {0, 0, 0, 0};
     if(0 != initWindow(&window, &renderer, 1000, 740))
         goto Quit;
     SDL_Texture *whitePieceImage = NULL;
@@ -38,6 +39,9 @@ int main(int argc, char *argv[]){
     blackQueenImage = loadImage("assets/blackQueen.bmp", renderer);
     SDL_Texture *whiteQueenImage = NULL;
     whiteQueenImage = loadImage("assets/whiteQueen.bmp", renderer);
+
+    SDL_Texture * txtAuTourDes = NULL;
+    txtAuTourDes = loadText("fonts/Nunito-SemiBold.ttf", renderer, "Au tour des : ", black);
 
     initPieces(whitePieces, board.nbPieces, WHITE, board.size);
     initPieces(blackPieces, board.nbPieces, BLACK, board.size);
@@ -137,9 +141,13 @@ int main(int argc, char *argv[]){
             }
         }
         drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, whiteQueenImage, blackQueenImage, yellow, blackTiles);
+        drawInfos(renderer, board, txtAuTourDes, currentPlayer, blackPieceImage, whitePieceImage);
+
+        updateView(renderer);
     }while(gameState == CONTINUE);
 
     Quit:
+    /// Destroy Texture
     if(NULL != whitePieceImage)
         SDL_DestroyTexture(whitePieceImage);
     if(NULL != blackPieceImage)
@@ -148,10 +156,14 @@ int main(int argc, char *argv[]){
         SDL_DestroyTexture(whiteQueenImage);
     if(NULL != blackQueenImage)
         SDL_DestroyTexture(blackQueenImage);
+    if(NULL != txtAuTourDes)
+        SDL_DestroyTexture(txtAuTourDes);
+
     if(NULL != renderer)
         SDL_DestroyRenderer(renderer);
     if(NULL != window)
         SDL_DestroyWindow(window);
+    TTF_Quit();
     SDL_Quit();
     return statut;
 }
