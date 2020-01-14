@@ -56,6 +56,28 @@ int main(int argc, char *argv[]){
     SDL_Event event;
     do {
 
+        // Search all possible move
+        // checkAvailableMove(board, blackTiles, whitePieces, blackPieces);
+        printf("\nBLABLA :");
+        if(currentPlayer == WHITE) {
+            checkAvailableMove(board, blackTiles, whitePieces, blackPieces);
+            for(int i = 0; i<board.nbPieces; i++) {
+                printf("\t%d", whitePieces[i].canMove);
+            }
+        }
+        else {
+            checkAvailableMove(board, blackTiles, blackPieces, whitePieces);
+            for(int i = 0; i<board.nbPieces; i++) {
+                printf("\t%d", blackPieces[i].canMove);
+            }
+        }
+        drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, whiteQueenImage, blackQueenImage, yellow, blackTiles);
+        drawInfos(renderer, board, txtAuTourDes, currentPlayer, blackPieceImage, whitePieceImage);
+
+        updateView(renderer);
+
+
+
         SDL_WaitEvent(&event);
         switch(event.type){
         case SDL_QUIT :
@@ -78,6 +100,7 @@ int main(int argc, char *argv[]){
                     }
                 }
                 else if (currentPlayer == BLACK) {
+                    checkAvailableMove(board, blackTiles, blackPieces, whitePieces);
                     takenPiece = initMovement(blackPieces, board.nbPieces, event, defaultPiece);
                     if(FALSE == isSamePiece(defaultPiece, takenPiece)) {
                         if(takenPiece.isQueen == FALSE) {

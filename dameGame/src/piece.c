@@ -38,6 +38,7 @@ void initPieces(piece pieces[], int nbPieces, int color, int boardSize) {
             pieces[pieceIndex].width = WIDTH_PIECE;
             pieces[pieceIndex].renderPosX = 0;
             pieces[pieceIndex].renderPosY = 0;
+            pieces[pieceIndex].canMove = FALSE;
             pieceIndex++;
         }
         posX++;
@@ -229,5 +230,118 @@ void checkValidTakeMove(piece currentPiece, board board, tile blackTiles[], piec
     }
 }
 
+int checkIfCanTake(board board, tile blackTiles[], piece currentPiece, piece currentPieces[], piece opponentPieces[]) {
+    int nbTiles = ((board.size * board.size) / 2);
+    int colorOfPiece = -1;
+    int offsetBeforeY = -1;
+    int offsetAfterY = 1;
+    for(int i = 0; i<nbTiles; i++) {
+        if(currentPiece.color == WHITE) {
+            colorOfPiece = colorOfPieceOnTile(blackTiles[i], board, currentPieces, opponentPieces);
+        }
+        else {
+            colorOfPiece = colorOfPieceOnTile(blackTiles[i], board, opponentPieces, currentPieces);
+        }
 
+        switch (colorOfPiece) {
+        case FALSE :
+            break;
+        case WHITE:
+        case BLACK:
+            if(currentPiece.color != colorOfPiece) {
+                for (int j=0; j<nbTiles; j++) {
+                    if((blackTiles[i].posY == currentPiece.posY + offsetAfterY) // Bottom left
+                    && (blackTiles[i].posX == currentPiece.posX - 2)
+                    && (blackTiles[i].posY + 1 == blackTiles[j].posY) // Bottom left
+                    && (blackTiles[i].posX - 1 == blackTiles[j].posX)) {
+                        if(FALSE == checkIfTileOccupated(blackTiles[j], board, currentPieces, opponentPieces)) {
+                            return TRUE;
+                        }
+                    }
+                    else if((blackTiles[i].posY == currentPiece.posY + offsetAfterY) // Bottom right
+                    && (blackTiles[i].posX == currentPiece.posX)
+                    && (blackTiles[i].posY + 1 == blackTiles[j].posY) // Bottom right
+                    && (blackTiles[i].posX + 1 == blackTiles[j].posX)) {
+                        if(FALSE == checkIfTileOccupated(blackTiles[j], board, currentPieces, opponentPieces)) {
+                            return TRUE;
+                        }
+                    }
+                    else if((blackTiles[i].posY == currentPiece.posY + offsetBeforeY) // Top left
+                    && (blackTiles[i].posX == currentPiece.posX - 2)
+                    && (blackTiles[i].posY - 1 == blackTiles[j].posY) // Top left
+                    && (blackTiles[i].posX - 1 == blackTiles[j].posX)) {
+                        if(FALSE == checkIfTileOccupated(blackTiles[j], board, currentPieces, opponentPieces)) {
+                            return TRUE;
+                        }
+                    }
+                    else if((blackTiles[i].posY == currentPiece.posY + offsetBeforeY) // Top right
+                    && (blackTiles[i].posX == currentPiece.posX)
+                    && (blackTiles[i].posY - 1 == blackTiles[j].posY) // Top right
+                    && (blackTiles[i].posX + 1 == blackTiles[j].posX)) {
+                        if(FALSE == checkIfTileOccupated(blackTiles[j], board, currentPieces, opponentPieces)) {
+                            return TRUE;
+                        }
+                    }
+                }
+            }
+            break;
+        }
+    }
+    return FALSE;
+}
 
+int checkIfCanMove(board board, tile blackTiles[], piece currentPiece, piece currentPieces[], piece opponentPieces[]) {
+    int nbTiles = ((board.size * board.size) / 2);
+    int offsetY = (currentPiece.color == WHITE) ? 1 : -1 ;
+    for(int i = 0; i<nbTiles; i++) {
+        if(blackTiles[i].posY == currentPiece.posY + offsetY) {
+            if (blackTiles[i].posX == currentPiece.posX || blackTiles[i].posX == currentPiece.posX - 2) {
+                if(FALSE == checkIfTileOccupated(blackTiles[i], board, currentPieces, opponentPieces)) {
+                    return TRUE;
+                }
+            }
+        }
+    }
+    return FALSE;
+}
+
+void checkAvailableMove(board board, tile blackTiles[], piece currentPieces[], piece opponentPieces[]) {
+    int nbTiles = ((board.size * board.size) / 2);
+    int oneCanTake = FALSE;
+    int availableToTake[board.nbPieces];
+    int availableToMove[board.nbPieces];
+
+    for(int i = 0; i<board.nbPieces; i++) {
+        availableToTake[i] = checkIfCanTake(board, blackTiles, currentPieces[i], currentPieces, opponentPieces);
+        if(availableToTake[i] == TRUE) {
+            oneCanTake = TRUE;
+        }
+    }
+
+    if(oneCanTake == TRUE) {
+        for(int i = 0; i<board.nbPieces; i++) {
+            opponentPieces[i].canMove = TRUE;
+            if(availableToTake[i] == TRUE) {
+                currentPieces[i].canMove = TRUE;
+            }
+            else {
+                currentPieces[i].canMove = FALSE;
+            }
+        }
+        return;
+    }
+
+    for(int i = 0; i<board.nbPieces; i++) {
+        availableToMove[i] = checkIfCanMove(board, blackTiles, currentPieces[i], currentPieces, opponentPieces);
+    }
+    for(int i = 0; i<board.nbPieces; i++) {
+        opponentPieces[i].canMove = TRUE;
+        if(availableToMove[i] == TRUE) {
+            currentPieces[i].canMove = TRUE;
+        }
+        else {
+            currentPieces[i].canMove = FALSE;
+        }
+    }
+    return;
+}

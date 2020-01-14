@@ -69,6 +69,12 @@ tile* getTileFromCoordonate(tile blackTiles[], int posX, int posY, int nbTiles) 
 }
 
 int checkIfTileOccupated(tile blackTile, board board, piece whitePieces[], piece blackPieces[]) {
+    if((blackTile.posX > board.size)
+       || (blackTile.posX < 0)
+       || (blackTile.posY > board.size)
+       || (blackTile.posY < 0)) {
+        return -1;
+       }
     for(int i=0; i<board.nbPieces; i++) {
         if((whitePieces[i].posX == blackTile.posX+1) && (whitePieces[i].posY == blackTile.posY)) {
             return TRUE;

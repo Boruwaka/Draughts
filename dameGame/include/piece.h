@@ -12,3 +12,5 @@ void initKillPiece(tile dropTile, piece currentPieces[], piece opponentPieces[],
 void killPieceOnPosition(piece pieces[], board board, int posX, int posY);
 void movePieceInNewTile(tile dropTile, piece pieces[], tile blackTiles[], board board);
 void checkValidTakeMove(piece currentPiece, board board, tile blackTiles[], piece whitePieces[], piece blackPieces[]);
+
+void checkAvailableMove(board, tile[], piece[], piece[]);

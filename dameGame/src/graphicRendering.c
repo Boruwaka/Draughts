@@ -266,6 +266,12 @@ int drawPieces(SDL_Renderer *renderer, struct piece pieces[], struct board board
                 }
             }
             else {
+                if(pieces[i].canMove == FALSE) {
+                    SDL_SetTextureAlphaMod(pieceImage, 150);
+                }
+                else {
+                    SDL_SetTextureAlphaMod(pieceImage, 255);
+                }
                 if(0 != SDL_RenderCopy(renderer, pieceImage, NULL, &pieceParams)){
                     fprintf(stderr, "Erreur SDL_RenderCopy : %s", SDL_GetError());
                     return -1;
