@@ -266,7 +266,7 @@ int drawPieces(SDL_Renderer *renderer, struct piece pieces[], struct board board
                 }
             }
             else {
-                if(pieces[i].canMove == FALSE) {
+                if((pieces[i].isDisabled == TRUE) && (pieces[i].isPicked == FALSE)) {
                     SDL_SetTextureAlphaMod(pieceImage, 150);
                 }
                 else {
@@ -279,5 +279,6 @@ int drawPieces(SDL_Renderer *renderer, struct piece pieces[], struct board board
             }
         }
     }
+    SDL_SetTextureAlphaMod(pieceImage, 255);
     return 0;
 }

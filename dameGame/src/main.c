@@ -58,17 +58,16 @@ int main(int argc, char *argv[]){
 
         // Search all possible move
         // checkAvailableMove(board, blackTiles, whitePieces, blackPieces);
-        printf("\nBLABLA :");
         if(currentPlayer == WHITE) {
             checkAvailableMove(board, blackTiles, whitePieces, blackPieces);
             for(int i = 0; i<board.nbPieces; i++) {
-                printf("\t%d", whitePieces[i].canMove);
+                printf("\t%d", whitePieces[i].isDisabled);
             }
         }
         else {
             checkAvailableMove(board, blackTiles, blackPieces, whitePieces);
             for(int i = 0; i<board.nbPieces; i++) {
-                printf("\t%d", blackPieces[i].canMove);
+                printf("\t%d", blackPieces[i].isDisabled);
             }
         }
         drawGame(renderer, whitePieces, blackPieces, board, whitePieceImage, blackPieceImage, whiteQueenImage, blackQueenImage, yellow, blackTiles);
@@ -89,13 +88,16 @@ int main(int argc, char *argv[]){
                 if(currentPlayer == WHITE) {
                     takenPiece = initMovement(whitePieces, board.nbPieces, event, defaultPiece);
                     if(FALSE == isSamePiece(defaultPiece, takenPiece)) {
+                        takenPiece.isPicked = TRUE;
                         if(takenPiece.isQueen == FALSE) {
-                            checkValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
-                            checkValidTakeMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                            if( FALSE == checkValidTakeMove(takenPiece, board, blackTiles, whitePieces, blackPieces)) {
+                                checkValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                           }
                         }
                         else {
-                            checkQueenValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
-                            checkQueenValidTakeMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                            if( FALSE == checkQueenValidTakeMove(takenPiece, board, blackTiles, whitePieces, blackPieces)) {
+                                checkQueenValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                            }
                         }
                     }
                 }
@@ -104,12 +106,14 @@ int main(int argc, char *argv[]){
                     takenPiece = initMovement(blackPieces, board.nbPieces, event, defaultPiece);
                     if(FALSE == isSamePiece(defaultPiece, takenPiece)) {
                         if(takenPiece.isQueen == FALSE) {
-                            checkValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
-                            checkValidTakeMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                            if( FALSE == checkValidTakeMove(takenPiece, board, blackTiles, whitePieces, blackPieces)) {
+                                checkValidSimpleMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                           }
                         }
                         else{
-                            checkQueenValidSimpleMove(takenPiece, board, blackTiles, blackPieces, whitePieces);
-                            checkQueenValidTakeMove(takenPiece, board, blackTiles, whitePieces, blackPieces);
+                            if( FALSE == checkQueenValidTakeMove(takenPiece, board, blackTiles, whitePieces, blackPieces)) {
+                                checkQueenValidSimpleMove(takenPiece, board, blackTiles, blackPieces, whitePieces);
+                            }
                         }
                     }
                 }

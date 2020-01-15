@@ -39,7 +39,7 @@ typedef struct piece {
     int isDeath;
     int isQueen;
     int color;
-    int canMove;
+    int isDisabled;
 } piece;
 
 typedef struct board {

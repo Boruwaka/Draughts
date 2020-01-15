@@ -8,4 +8,4 @@ int checkIfTileOccupated(tile blackTile, board board, piece whitePieces[], piece
 int colorOfPieceOnTile(tile blackTile, board board, piece whitePieces[], piece blackPieces[]);
 void resetValidMove(board board, tile blackTiles[]);
 tile isValidDeplacement(board board, tile blackTiles[], SDL_Event event);
-void setPossibleMoveOnCoordonate(tile blackTiles[], int posX, int posY, int nbTiles, board board, piece whitePieces[], piece blackPieces[]);
+int setPossibleMoveOnCoordonate(tile blackTiles[], int posX, int posY, int nbTiles, board board, piece whitePieces[], piece blackPieces[]);

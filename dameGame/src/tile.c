@@ -127,14 +127,16 @@ tile isValidDeplacement(board board, tile blackTiles[], SDL_Event event) {
     return defaultTile;
 }
 
-void setPossibleMoveOnCoordonate(tile blackTiles[], int posX, int posY, int nbTiles, board board, piece whitePieces[], piece blackPieces[]) {
+int setPossibleMoveOnCoordonate(tile blackTiles[], int posX, int posY, int nbTiles, board board, piece whitePieces[], piece blackPieces[]) {
     for(int i=0; i < nbTiles; i++) {
         if( blackTiles[i].posX == posX && blackTiles[i].posY == posY ) {
             if( checkIfTileOccupated(blackTiles[i], board, whitePieces, blackPieces) == FALSE){
                 blackTiles[i].isPossibleMove = TRUE;
+                return TRUE;
             }
         }
     }
+    return FALSE;
 }
 
 

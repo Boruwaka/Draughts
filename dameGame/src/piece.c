@@ -38,7 +38,7 @@ void initPieces(piece pieces[], int nbPieces, int color, int boardSize) {
             pieces[pieceIndex].width = WIDTH_PIECE;
             pieces[pieceIndex].renderPosX = 0;
             pieces[pieceIndex].renderPosY = 0;
-            pieces[pieceIndex].canMove = FALSE;
+            pieces[pieceIndex].isDisabled = TRUE;
             pieceIndex++;
         }
         posX++;
@@ -67,8 +67,11 @@ piece initMovement(piece pieces[], int nbPieces, SDL_Event event, piece defaultP
         && event.button.y > ((pieces[i].height + SPACING_HEIGHT) * pieces[i].posY) - OFFSET_HEIGHT
         && event.button.x < ((pieces[i].width + SPACING_WIDTH) * pieces[i].posX)
         && event.button.x > ((pieces[i].width + SPACING_WIDTH) * pieces[i].posX) - OFFSET_WIDTH) {
-            pieces[i].isPicked = TRUE;
-            return pieces[i];
+            if(pieces[i].isDisabled == FALSE) {
+                pieces[i].isPicked = TRUE;
+                return pieces[i];
+            }
+            break;
         }
     }
     return defaultPiece;
@@ -97,7 +100,7 @@ int isSamePiece(piece defaultPiece, piece piece) {
     return FALSE;
 }
 
-void checkValidSimpleMove(piece currentPiece, board board, tile blackTiles[], piece whitePieces[], piece blackPieces[]) {
+int checkValidSimpleMove(piece currentPiece, board board, tile blackTiles[], piece whitePieces[], piece blackPieces[]) {
     int nbTiles = ((board.size * board.size) / 2);
     int offsetY = (currentPiece.color == WHITE) ? 1 : -1 ;
     for(int i = 0; i<nbTiles; i++) {
@@ -173,10 +176,11 @@ void movePieceInNewTile(tile dropTile, piece pieces[], tile blackTiles[], board 
     }
 }
 
-void checkValidTakeMove(piece currentPiece, board board, tile blackTiles[], piece whitePieces[], piece blackPieces[]) {
+int checkValidTakeMove(piece currentPiece, board board, tile blackTiles[], piece whitePieces[], piece blackPieces[]) {
     int nbTiles = ((board.size * board.size) / 2);
     int offsetBeforeY = -1;
     int offsetAfterY = 1;
+    int isAtLeastOneAvailable = FALSE;
     for(int i = 0; i<nbTiles; i++) {
         int colorOfPiece = colorOfPieceOnTile(blackTiles[i], board, whitePieces, blackPieces);
         switch (colorOfPiece) {
@@ -188,19 +192,27 @@ void checkValidTakeMove(piece currentPiece, board board, tile blackTiles[], piec
             if(currentPiece.color == BLACK) {
                 if((blackTiles[i].posY == currentPiece.posY + offsetAfterY) // Bottom left
                 && (blackTiles[i].posX == currentPiece.posX - 2)) {
-                    setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX - 3, currentPiece.posY + 2, nbTiles, board, whitePieces, blackPieces);
+                    if( TRUE == setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX - 3, currentPiece.posY + 2, nbTiles, board, whitePieces, blackPieces)) {
+                        isAtLeastOneAvailable = TRUE;
+                    }
                 }
                 else if((blackTiles[i].posY == currentPiece.posY + offsetAfterY) // Bottom right
                 && (blackTiles[i].posX == currentPiece.posX)) {
-                    setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX + 1, currentPiece.posY + 2, nbTiles, board, whitePieces, blackPieces);
+                    if( TRUE == setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX + 1, currentPiece.posY + 2, nbTiles, board, whitePieces, blackPieces)) {
+                        isAtLeastOneAvailable = TRUE;
+                    }
                 }
                 else if((blackTiles[i].posY == currentPiece.posY + offsetBeforeY) // Top left
                 && (blackTiles[i].posX == currentPiece.posX - 2)) {
-                    setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX - 3, currentPiece.posY - 2, nbTiles, board, whitePieces, blackPieces);
+                    if( TRUE == setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX - 3, currentPiece.posY - 2, nbTiles, board, whitePieces, blackPieces)) {
+                        isAtLeastOneAvailable = TRUE;
+                    }
                 }
                 else if((blackTiles[i].posY == currentPiece.posY + offsetBeforeY) // Top right
                 && (blackTiles[i].posX == currentPiece.posX)) {
-                    setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX + 1, currentPiece.posY - 2, nbTiles, board, whitePieces, blackPieces);
+                    if( TRUE == setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX + 1, currentPiece.posY - 2, nbTiles, board, whitePieces, blackPieces)) {
+                        isAtLeastOneAvailable = TRUE;
+                    }
                 }
             }
             break;
@@ -208,19 +220,27 @@ void checkValidTakeMove(piece currentPiece, board board, tile blackTiles[], piec
             if(currentPiece.color == WHITE) {
                 if((blackTiles[i].posY == currentPiece.posY + offsetAfterY) // Bottom left
                 && (blackTiles[i].posX == currentPiece.posX - 2)) {
-                    setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX - 3, currentPiece.posY + 2, nbTiles, board, whitePieces, blackPieces);
+                    if( TRUE == setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX - 3, currentPiece.posY + 2, nbTiles, board, whitePieces, blackPieces)) {
+                        isAtLeastOneAvailable = TRUE;
+                    }
                 }
                 else if((blackTiles[i].posY == currentPiece.posY + offsetAfterY) // Bottom right
                 && (blackTiles[i].posX == currentPiece.posX)) {
-                    setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX + 1, currentPiece.posY + 2, nbTiles, board, whitePieces, blackPieces);
+                    if( TRUE == setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX + 1, currentPiece.posY + 2, nbTiles, board, whitePieces, blackPieces)) {
+                        isAtLeastOneAvailable = TRUE;
+                    }
                 }
                 else if((blackTiles[i].posY == currentPiece.posY + offsetBeforeY) // Top left
                 && (blackTiles[i].posX == currentPiece.posX - 2)) {
-                    setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX - 3, currentPiece.posY - 2, nbTiles, board, whitePieces, blackPieces);
+                    if( TRUE == setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX - 3, currentPiece.posY - 2, nbTiles, board, whitePieces, blackPieces)) {
+                        isAtLeastOneAvailable = TRUE;
+                    }
                 }
                 else if((blackTiles[i].posY == currentPiece.posY + offsetBeforeY) // Top right
                 && (blackTiles[i].posX == currentPiece.posX)) {
-                    setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX + 1, currentPiece.posY - 2, nbTiles, board, whitePieces, blackPieces);
+                    if( TRUE == setPossibleMoveOnCoordonate(blackTiles, currentPiece.posX + 1, currentPiece.posY - 2, nbTiles, board, whitePieces, blackPieces)) {
+                        isAtLeastOneAvailable = TRUE;
+                    }
                 }
             }
             break;
@@ -228,6 +248,7 @@ void checkValidTakeMove(piece currentPiece, board board, tile blackTiles[], piec
             break;
         }
     }
+    return isAtLeastOneAvailable;
 }
 
 int checkIfCanTake(board board, tile blackTiles[], piece currentPiece, piece currentPieces[], piece opponentPieces[]) {
@@ -320,12 +341,12 @@ void checkAvailableMove(board board, tile blackTiles[], piece currentPieces[], p
 
     if(oneCanTake == TRUE) {
         for(int i = 0; i<board.nbPieces; i++) {
-            opponentPieces[i].canMove = TRUE;
+            opponentPieces[i].isDisabled = FALSE;
             if(availableToTake[i] == TRUE) {
-                currentPieces[i].canMove = TRUE;
+                currentPieces[i].isDisabled = FALSE;
             }
             else {
-                currentPieces[i].canMove = FALSE;
+                currentPieces[i].isDisabled = TRUE;
             }
         }
         return;
@@ -335,12 +356,12 @@ void checkAvailableMove(board board, tile blackTiles[], piece currentPieces[], p
         availableToMove[i] = checkIfCanMove(board, blackTiles, currentPieces[i], currentPieces, opponentPieces);
     }
     for(int i = 0; i<board.nbPieces; i++) {
-        opponentPieces[i].canMove = TRUE;
+        opponentPieces[i].isDisabled = FALSE;
         if(availableToMove[i] == TRUE) {
-            currentPieces[i].canMove = TRUE;
+            currentPieces[i].isDisabled = FALSE;
         }
         else {
-            currentPieces[i].canMove = FALSE;
+            currentPieces[i].isDisabled = TRUE;
         }
     }
     return;

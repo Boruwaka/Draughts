@@ -4,8 +4,9 @@
 #include "properties.h"
 #include "graphicRendering.h"
 
-void checkQueenValidSimpleMove(piece currentPiece, board board, tile blackTiles[], piece whitePieces[], piece blackPieces[]) {
+int checkQueenValidSimpleMove(piece currentPiece, board board, tile blackTiles[], piece whitePieces[], piece blackPieces[]) {
     int nbTiles = ((board.size * board.size) / 2);
+    int isAtLeastOneAvailable = FALSE;
     struct tile *currentTile;
 
     // Diagonale bottom left
@@ -13,6 +14,7 @@ void checkQueenValidSimpleMove(piece currentPiece, board board, tile blackTiles[
         currentTile = getTileFromCoordonate(blackTiles, currentPiece.posX - i-1, currentPiece.posY + i, nbTiles);
         if (currentTile != NULL) {
             if( checkIfTileOccupated(*currentTile, board, whitePieces, blackPieces) == FALSE) {
+                isAtLeastOneAvailable = TRUE;
                 currentTile->isPossibleMove = TRUE;
             }
             else {
@@ -26,6 +28,7 @@ void checkQueenValidSimpleMove(piece currentPiece, board board, tile blackTiles[
         currentTile = getTileFromCoordonate(blackTiles, currentPiece.posX + i-1, currentPiece.posY + i, nbTiles);
         if (currentTile != NULL) {
             if( checkIfTileOccupated(*currentTile, board, whitePieces, blackPieces) == FALSE) {
+                isAtLeastOneAvailable = TRUE;
                 currentTile->isPossibleMove = TRUE;
             }
             else {
@@ -39,6 +42,7 @@ void checkQueenValidSimpleMove(piece currentPiece, board board, tile blackTiles[
         currentTile = getTileFromCoordonate(blackTiles, currentPiece.posX - i-1, currentPiece.posY - i, nbTiles);
         if (currentTile != NULL) {
             if( checkIfTileOccupated(*currentTile, board, whitePieces, blackPieces) == FALSE) {
+                isAtLeastOneAvailable = TRUE;
                 currentTile->isPossibleMove = TRUE;
             }
             else {
@@ -52,6 +56,7 @@ void checkQueenValidSimpleMove(piece currentPiece, board board, tile blackTiles[
         currentTile = getTileFromCoordonate(blackTiles, currentPiece.posX + i-1, currentPiece.posY - i, nbTiles);
         if (currentTile != NULL) {
             if( checkIfTileOccupated(*currentTile, board, whitePieces, blackPieces) == FALSE) {
+                isAtLeastOneAvailable = TRUE;
                 currentTile->isPossibleMove = TRUE;
             }
             else {
@@ -59,6 +64,7 @@ void checkQueenValidSimpleMove(piece currentPiece, board board, tile blackTiles[
             }
         }
     }
+    return isAtLeastOneAvailable;
 }
 
 void checkQueenValidTakeMove(piece currentPiece, board board, tile blackTiles[], piece whitePieces[], piece blackPieces[]) {
